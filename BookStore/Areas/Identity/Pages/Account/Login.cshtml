@@ -1,0 +1,33 @@
+﻿@page
+@model BookStore.Areas.Identity.Pages.Account.LoginModel
+
+<div class="col-xs-1 " align="center">
+
+    <div class="text-start text-black" style="max-width:500px">
+        <section class="">
+            <form id="account" method="post">
+
+                <h2 class="text-center mb-5">Log in to your account</h2>
+                <div asp-validation-summary="ModelOnly" class="text-danger" aria-required="true"></div>
+                <ht />
+
+                <div>
+                    <label asp-for="Input.Name" class="form-label"></label>
+
+                    <input asp-for="Input.Name" class="form-control mb-3" />
+                    <span asp-validation-for="Input.Name" class="text-danger "></span>
+                </div>
+
+                <div>
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" aria-required="true" />
+                    <span asp-validation-for="Input.Password" class="text-danger mb-3"></span>
+                </div>
+
+                <div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mt-4">Log in</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

@@ -2,8 +2,30 @@
 
 <PageTitle>BookStore</PageTitle>
 
-<div class="page">
-    <main>
-        @Body
-    </main>
-</div>
+
+<nav>
+    <div class="d-flex justify-content-between py-3 px-5 border-bottom">
+        <div>Bookstore</div>
+        <div>
+            <div class="w-100 d-flex justify-content-end gap-5">
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <NavLink class="text-decoration-none" href="ManageBooks">Manage Books</NavLink>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView>
+                    <Authorized>
+                        <NavLink class="text-decoration-none" href="Identity/Account/Logout">Logout</NavLink>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink class="text-decoration-none" href="Identity/Account/Register">Register</NavLink>
+                        <NavLink class="text-decoration-none" href="Identity/Account/Login">Login</NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+</nav>
+<main>
+    @Body
+</main>

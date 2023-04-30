@@ -1,8 +1,8 @@
-
 using BookStore.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using BookStore.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +18,19 @@ builder.Services.AddDbContextFactory<DataContext>(
 builder.Services.AddDbContext<DataContext>(
     options => options.UseSqlServer(cs) );
 
+
+//Identity 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 5;
+    options.SignIn.RequireConfirmedEmail = false;
+})
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<DataContext>();
 
 var app = builder.Build();
 

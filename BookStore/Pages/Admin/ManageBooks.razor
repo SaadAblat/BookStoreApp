@@ -1,0 +1,18 @@
+﻿@page "/ManageBooks"
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div> Manage Books </div>
+        <NavLink href="AddBook">Add a new book</NavLink>
+    </Authorized>
+
+
+    <NotAuthorized>
+        <div>Not authorized</div>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+
+}

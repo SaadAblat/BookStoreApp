@@ -1,0 +1,72 @@
+﻿@page "/AddBook"
+@using BookStore.Entities;
+
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+
+   @*     public ICollection<BookGenre> BookGenres { get; set; }
+        public ICollection<Review> Reviews { get; set; }*@
+
+       <label for="book-title">Book title : </label>
+       <input id="book-title" type="text" @bind-value="@_book.Title"/>
+
+        <label for="book-author">Book's author : </label>
+        <select id="book-author" type="text" @bind="@_book.Author">
+            <option value="">Select an author</option>
+            @foreach(var author in _authors)
+            {
+                <option value="author">@author.Name</option>
+            }
+        </select> 
+
+@*        <label for="book-genre">Book's genre : </label>
+        <select id="book-author" type="text" @bind="@_book.BookGenres">
+            <option value="">Select an author</option>
+            @foreach (var author in _authors)
+            {
+                <option value="author">@author.Name</option>
+            }
+        </select>*@
+
+
+
+
+
+        <label for="book-publisher">Publisher name : </label>
+        <input id="book-publisher" type="text" @bind-value="@_book.PublisherName" />
+
+        <label for="book-publication-year">Publication year : </label>
+        <input id="book-publication-year" type="text" @bind-value="@_book.PublicationYear" />
+
+        <label for="book-cover">Book cover : </label>
+        <input id="book-cover" type="text" @bind-value="@_book.BookCoverUrl" />
+
+        <label for="stock-quantity">Stock quantity : </label>
+        <input id="stock-quantity" type="text" @bind-value="@_book.StockQuantity" />
+        
+        <label for="price">Price : </label>
+        <input id="price" type="text" @bind-value="@_book.Price" />
+
+        <label for="isbn">ISBN : </label>
+        <input id="isbn" type="text" @bind-value="@_book.ISBN" />
+
+
+        
+
+    </Authorized>
+
+
+    <NotAuthorized>
+        <div>Not authorized</div>
+    </NotAuthorized>
+
+
+</AuthorizeView>
+
+
+@code {
+    Book _book = new();
+    List<Author> _authors = new();
+}
