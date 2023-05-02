@@ -2,10 +2,17 @@
 
 <AuthorizeView Roles="Admin">
     <Authorized>
-        <div> Manage Books </div>
-        <NavLink href="AddBook">Add a new book</NavLink>
-    </Authorized>
+        
+        <div class="container vh-100 shadow d-flex flex-column w-100 text-center">
+            <div class="fs-3"> Manage Books </div>
 
+            <div class="d-flex flex-column gap-2 my-3">
+                <NavLink class="fs-5" href="AddAuthor">Add a new Author</NavLink>
+                <NavLink class="fs-5" href="AddGenre">Add a new genre</NavLink>
+                <NavLink class="fs-5" href="AddBook">Add a new book</NavLink>
+            </div>
+        </div>
+    </Authorized>
 
     <NotAuthorized>
         <div>Not authorized</div>

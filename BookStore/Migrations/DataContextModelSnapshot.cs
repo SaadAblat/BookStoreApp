@@ -102,11 +102,11 @@ namespace BookStore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("BirthDate")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("DeathDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("DeathDate")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
