@@ -1,4 +1,9 @@
 ﻿@page "/ManageBooks"
+@using BookStore.Data;
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory;
 
 <AuthorizeView Roles="Admin">
     <Authorized>
@@ -11,7 +16,42 @@
                 <NavLink class="fs-5" href="AddGenre">Add a new genre</NavLink>
                 <NavLink class="fs-5" href="AddBook">Add a new book</NavLink>
             </div>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Publisher</th>
+                        <th>Publication Year</th>
+                        <th>Price</th>
+                        <th>Genres</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var book in _books)
+                    {
+                        <tr>
+                            <td>@book.Title</td>
+                            <td>@book.Author.Name</td>
+                            <td>@book.ISBN</td>
+                            <td>@book.PublisherName</td>
+                            <td>@book.PublicationYear</td>
+                            <td>@book.Price.ToString("C2")</td>
+                            <td>
+                                @foreach (var genre in book.BookGenres)
+                                {
+                                    <span>@genre.Genre.Name; </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
+
+
     </Authorized>
 
     <NotAuthorized>
@@ -22,4 +62,15 @@
 
 @code {
 
+    List<Book> _books = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get Authors
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            _books = await repo.GetAllBooksAsync();
+        }
+    }
 }

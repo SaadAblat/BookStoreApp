@@ -1,0 +1,149 @@
+﻿@page "/AddBook"
+
+@using BookStore.Data;
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+
+@inject IDbContextFactory<DataContext> ContextFactory;
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+
+            <h4>Add a new Book</h4>
+
+            @*Book Title*@
+            <label for="title" class="form-label"> Title</label>
+            <input id="title" type="text" class="form-input form-control" @bind-value="_createdBook.Title" />
+
+            @*AuthorId*@
+            <label for="title" class="form-label"> Author Id</label>
+            <select class="form-input form-control " id="book-author" @bind="_createdBook.AuthorId">
+                <option value="">Select an author</option>
+
+                @foreach (var author in _authors)
+                {
+                    <option value="@author.ID">@author.Name</option>
+                }
+            </select>
+
+            @*Book ISBN*@
+            <label for="ISBN" class="form-label"> ISBN</label>
+            <input id="ISBN" type="text" class="form-input form-control" @bind-value="_createdBook.ISBN" />
+            
+            @*Book PublisherName*@
+            <label for="PublisherName" class="form-label"> PublisherName</label>
+            <input id="PublisherName" type="text" class="form-input form-control" @bind-value="_createdBook.PublisherName" />
+
+            @*Book PublicationYear*@
+            <label for="PublicationYear" class="form-label"> PublicationYear</label>
+            <input id="PublicationYear" type="text" class="form-input form-control" @bind-value="_createdBook.PublicationYear" />
+
+            @*Book Price*@
+            <label for="Price" class="form-label"> Price</label>
+            <input id="Price" type="text" class="form-input form-control" @bind-value="_createdBook.Price" />
+
+            @*Book StockQuantity*@
+            <label for="StockQuantity" class="form-label"> StockQuantity</label>
+            <input id="StockQuantity" type="text" class="form-input form-control" @bind-value="_createdBook.StockQuantity" />
+
+            @*Book BookCoverUrl*@
+            <label for="BookCoverUrl" class="form-label"> BookCoverUrl</label>
+            <input id="BookCoverUrl" type="text" class="form-input form-control" @bind-value="_createdBook.BookCoverUrl" />
+
+            @*Book genres*@
+            <div class="d-flex gap-4 flex-wrap my-3">
+                @foreach (var genre in _genres)
+                {
+                    <input type="checkbox" value="@genre.ID" @onchange="@(e => HandleCheckChange(e, genre))" /> @genre.Name
+                }
+            </div>
+
+
+        </div>
+
+        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="SaveBookAsync">Save author</button></div>
+        <div class=" w-100 text-center p-5">
+            <div class="alert-success"> @validationMessage</div>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+
+    Book _createdBook = new();
+
+    List<Author> _authors = new();
+    List<Genre> _genres = new();
+    List<BookGenre> _bookGenres = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get Authors
+        using(var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        {
+            _authors = await repo.GetAllAuthorsAsync();
+        }
+
+        //Get Genres
+        using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+        {
+            _genres = await repo.GetAllGenreAsync();
+        }
+    }
+
+
+    string validationMessage = "";
+    async Task ResetValidationMessage()
+    {
+        await Task.Delay(3000);
+        validationMessage = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task SaveBookAsync()
+    {
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            await repo.CreateBookAsync(_createdBook);
+        }
+
+        _createdBook = new Book();
+
+        validationMessage = "Book added succesfully";
+        await InvokeAsync(StateHasChanged);
+
+        await ResetValidationMessage();
+
+    }
+
+    void HandleCheckChange(ChangeEventArgs e, Genre genre)
+    {
+        bool isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            _bookGenres.Add(new BookGenre
+                {
+                    BookId = _createdBook.ID,
+                    GenreId = genre.ID
+                }
+            );
+            _createdBook.BookGenres = _bookGenres;
+        }
+        else
+        {
+            _bookGenres.RemoveAll(bg => bg.GenreId == genre.ID);
+            _createdBook.BookGenres = _bookGenres;
+        }
+    }
+
+}
+
+
