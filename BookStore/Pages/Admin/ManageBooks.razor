@@ -5,17 +5,13 @@
 @using Microsoft.EntityFrameworkCore;
 @inject IDbContextFactory<DataContext> ContextFactory;
 
+@inject NavigationManager NavigationManager
+
 <AuthorizeView Roles="Admin">
     <Authorized>
         
         <div class="container vh-100 shadow d-flex flex-column w-100 text-center">
             <div class="fs-3"> Manage Books </div>
-
-            <div class="d-flex flex-column gap-2 my-3">
-                <NavLink class="fs-5" href="AddAuthor">Add a new Author</NavLink>
-                <NavLink class="fs-5" href="AddGenre">Add a new genre</NavLink>
-                <NavLink class="fs-5" href="AddBook">Add a new book</NavLink>
-            </div>
 
             <table class="table table-striped">
                 <thead>
@@ -27,6 +23,7 @@
                         <th>Publication Year</th>
                         <th>Price</th>
                         <th>Genres</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,10 +42,19 @@
                                     <span>@genre.Genre.Name; </span>
                                 }
                             </td>
+                            <td>
+                                <button class="btn btn-primary" @onclick="() => GoToUpdateBook(book.ID)">Update</button>
+                                <button class="btn btn-danger" @onclick="() => DeleteBook(book.ID)">Delete</button>
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
+            <div class="d-flex flex-column gap-2 my-3">
+                <NavLink class="fs-5" href="AddAuthor">Add a new Author</NavLink>
+                <NavLink class="fs-5" href="AddGenre">Add a new genre</NavLink>
+                <NavLink class="fs-5" href="AddBook">Add a new book</NavLink>
+            </div>
         </div>
 
 
@@ -72,5 +78,25 @@
         {
             _books = await repo.GetAllBooksAsync();
         }
+    }
+
+    async Task DeleteBook(int id)
+    {
+        if (_books.Any(x => x.ID == id))
+        {
+            using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+            {
+
+                _books.Remove(_books.FirstOrDefault(x => x.ID == id));
+                await repo.DeleteBookAsync(id);
+                await InvokeAsync(StateHasChanged);
+            }
+
+        }
+    }
+
+    private void GoToUpdateBook(int id)
+    {
+        NavigationManager.NavigateTo($"/updatebook/{id}");
     }
 }

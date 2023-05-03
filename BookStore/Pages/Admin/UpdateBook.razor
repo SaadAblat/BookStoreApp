@@ -1,4 +1,4 @@
-﻿@page "/AddBook"
+﻿@page "/Updatebook/{id:int}"
 
 @using BookStore.Data;
 @using BookStore.Data.Repositories.Admin;
@@ -11,15 +11,15 @@
     <Authorized>
         <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
 
-            <h4>Add a new Book</h4>
+            <h4>Update a Book</h4>
 
             @*Book Title*@
             <label for="title" class="form-label"> Title</label>
-            <input id="title" type="text" class="form-input form-control" @bind-value="_createdBook.Title" />
+            <input id="title" type="text" class="form-input form-control" @bind-value="_updatedBook.Title" />
 
             @*AuthorId*@
             <label for="title" class="form-label"> Author Id</label>
-            <select class="form-input form-control " id="book-author" @bind="_createdBook.AuthorId">
+            <select class="form-input form-control " id="book-author" @bind="_updatedBook.AuthorId">
                 <option value="">Select an author</option>
 
                 @foreach (var author in _authors)
@@ -27,46 +27,53 @@
                     <option value="@author.ID">@author.Name</option>
                 }
             </select>
-            <a target="_blank"  class="fs-5" href="AddAuthor">Add a new Author</a>
+            <a target="_blank" class="fs-5" href="AddAuthor">Add a new Author</a>
 
 
             @*Book ISBN*@
             <label for="ISBN" class="form-label"> ISBN</label>
-            <input id="ISBN" type="text" class="form-input form-control" @bind-value="_createdBook.ISBN" />
-            
+            <input id="ISBN" type="text" class="form-input form-control" @bind-value="_updatedBook.ISBN" />
+
             @*Book PublisherName*@
             <label for="PublisherName" class="form-label"> PublisherName</label>
-            <input id="PublisherName" type="text" class="form-input form-control" @bind-value="_createdBook.PublisherName" />
+            <input id="PublisherName" type="text" class="form-input form-control" @bind-value="_updatedBook.PublisherName" />
 
             @*Book PublicationYear*@
             <label for="PublicationYear" class="form-label"> PublicationYear</label>
-            <input id="PublicationYear" type="text" class="form-input form-control" @bind-value="_createdBook.PublicationYear" />
+            <input id="PublicationYear" type="text" class="form-input form-control" @bind-value="_updatedBook.PublicationYear" />
 
             @*Book Price*@
             <label for="Price" class="form-label"> Price</label>
-            <input id="Price" type="text" class="form-input form-control" @bind-value="_createdBook.Price" />
+            <input id="Price" type="text" class="form-input form-control" @bind-value="_updatedBook.Price" />
 
             @*Book StockQuantity*@
             <label for="StockQuantity" class="form-label"> StockQuantity</label>
-            <input id="StockQuantity" type="text" class="form-input form-control" @bind-value="_createdBook.StockQuantity" />
+            <input id="StockQuantity" type="text" class="form-input form-control" @bind-value="_updatedBook.StockQuantity" />
 
             @*Book BookCoverUrl*@
             <label for="BookCoverUrl" class="form-label"> BookCoverUrl</label>
-            <input id="BookCoverUrl" type="text" class="form-input form-control" @bind-value="_createdBook.BookCoverUrl" />
+            <input id="BookCoverUrl" type="text" class="form-input form-control" @bind-value="_updatedBook.BookCoverUrl" />
 
             @*Book genres*@
             <div class="d-flex gap-4 flex-wrap my-3">
-                @foreach (var genre in _genres)
+                @if(_genres != null && _genres.Any())
                 {
-                    <input type="checkbox" value="@genre.ID" @onchange="@(e => HandleCheckChange(e, genre))" /> @genre.Name
+                    @foreach (var genre in _genres)
+                    {
+
+                            <input type="checkbox" value="@genre.ID" @onchange="@(e => HandleCheckChange(e, genre))"
+                               checked="@_updatedBook.BookGenres.Any(bg => bg.GenreId == genre.ID)" /> @genre.Name
+  
+                    }
                 }
+
             </div>
             <a target="_blank" class="fs-5" href="AddGenre">Add a new Genre</a>
 
 
         </div>
 
-        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="SaveBookAsync">Save book</button></div>
+        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="SaveBookAsync">Save author</button></div>
         <div class=" w-100 text-center p-5">
             <div class="alert-success"> @validationMessage</div>
         </div>
@@ -78,26 +85,35 @@
 </AuthorizeView>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
 
-
-    Book _createdBook = new();
+    Book _updatedBook = new() { BookGenres = new List<BookGenre>() };
 
     List<Author> _authors = new();
-    List<Genre> _genres = new();
+    List<Genre> _genres = new List<Genre>();
     List<BookGenre> _bookGenres = new();
 
     protected override async Task OnInitializedAsync()
     {
         //Get Authors
-        using(var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
         {
             _authors = await repo.GetAllAuthorsAsync();
+
         }
 
         //Get Genres
         using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
         {
             _genres = await repo.GetAllGenreAsync();
+
+        }
+        //Get Book
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            _updatedBook = await repo.GetBookByIdAsync(Id);
+            _bookGenres = _updatedBook.BookGenres.ToList();
         }
     }
 
@@ -114,16 +130,15 @@
     {
         using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
         {
-            await repo.CreateBookAsync(_createdBook);
+            await repo.UpdateBookAsync(_updatedBook);
         }
-
-        _createdBook = new Book();
-
-        validationMessage = "Book added succesfully";
+       
+        
+        validationMessage = "Book updated succesfully";
         await InvokeAsync(StateHasChanged);
 
         await ResetValidationMessage();
-
+        
     }
 
     void HandleCheckChange(ChangeEventArgs e, Genre genre)
@@ -134,17 +149,17 @@
         {
             _bookGenres.Add(new BookGenre
                 {
-                    BookId = _createdBook.ID,
+                    BookId = _updatedBook.ID,
                     GenreId = genre.ID
                 }
             );
-            _createdBook.BookGenres = _bookGenres;
         }
         else
         {
             _bookGenres.RemoveAll(bg => bg.GenreId == genre.ID);
-            _createdBook.BookGenres = _bookGenres;
+           
         }
+        _updatedBook.BookGenres = _bookGenres;
     }
 
 }

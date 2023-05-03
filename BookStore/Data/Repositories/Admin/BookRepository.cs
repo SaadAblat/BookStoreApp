@@ -25,9 +25,14 @@ namespace BookStore.Data.Repositories.Admin
             return book;
         }
 
+
         public async Task<Book> GetBookByIdAsync(int id)
         {
-            return await _ctx.Books.FindAsync(id);
+            return await _ctx.Books
+                .Include(b => b.Author)
+                .Include(b => b.BookGenres)
+                    .ThenInclude(bg => bg.Genre)
+                .FirstOrDefaultAsync(x => x.ID == id);
         }
 
         public async Task<List<Book>> GetAllBooksAsync()
@@ -58,9 +63,16 @@ namespace BookStore.Data.Repositories.Admin
             book.PublicationYear = updatedBook.PublicationYear;
             book.BookCoverUrl = updatedBook.BookCoverUrl;
             book.StockQuantity = updatedBook.StockQuantity;
+            book.BookGenres.Clear();
+            foreach (var bg in updatedBook.BookGenres)
+            {
+                var genre = await _ctx.Genres.FindAsync(bg.GenreId);
+                if (genre != null)
+                {
+                    book.BookGenres.Add(new BookGenre { Book = book, Genre = genre });
+                }
+            }
 
-            book.BookGenres = updatedBook.BookGenres;
-            
             await _ctx.SaveChangesAsync();
             return book;
         }
