@@ -1,0 +1,173 @@
+﻿@page "/Updatebook/{id:int}"
+
+@using BookStore.Data;
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+
+@inject IDbContextFactory<DataContext> ContextFactory;
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+
+            <h4>Update @_updatedBook.Title</h4>
+
+            @*Book Title*@
+            <label for="title" class="form-label">Title</label>
+            <input id="title" type="text" class="form-control" @bind-value="_updatedBook.Title" />
+
+            @*AuthorId*@
+            <label for="author" class="form-label">Aurthor</label>
+            <select class="form-select form-control" id="author" @bind="_updatedBook.AuthorId">
+                <option value="">
+                    Select an author
+                </option>
+
+                @foreach (var author in _authors)
+                {
+                    <option value="@author.ID">@author.Name</option>
+                }
+            </select>
+            <a target="_blank" href="AddAuthor">Add a new author</a>
+
+            @*Book ISBN*@
+            <label for="isbn" class="form-label">ISBN</label>
+            <input id="isbn" type="text" class="form-control" @bind-value="_updatedBook.ISBN" />
+
+            @*PublisherName*@
+            <label for="publisher-name" class="form-label">Publisher name</label>
+            <input id="publisher-name" type="text" class="form-control" @bind-value="_updatedBook.PublisherName" />
+
+            @*PublicationYear*@
+            <label for="publication-year" class="form-label">Publication Year</label>
+            <input id="publication-year" type="number" class="form-control" @bind-value="_updatedBook.PublicationYear" />
+
+            @*Price*@
+            <label for="price" class="form-label">Price</label>
+            <input id="price" type="number" class="form-control" @bind-value="_updatedBook.Price" />
+
+            @*StockQuantity*@
+            <label for="stock-quantity" class="form-label">Stock quantity</label>
+            <input id="stock-quantity" type="number" class="form-control" @bind-value="_updatedBook.StockQuantity" />
+
+            @*BookCoverUrl*@
+            
+            <div class="d-flex flex-row w-100 justify-content-between ">
+                <div class="d-flex flex-column w-75">
+                    <label for="book-cover-url" class="form-label">Book cover url</label>
+                    <input id="book-cover-url" type="text" class="form-control" @bind-value="_updatedBook.BookCoverUrl" />
+                </div>
+
+                <img height="200" src="@_updatedBook.BookCoverUrl" />
+            </div>
+           
+
+            @*Book Genres*@
+            <div class="d-flex gap-4 flex-wrap my-3">
+
+                @foreach (var genre in _genres)
+                {
+                    <input
+                        checked ="@_updatedBook.BookGenres.Any(bg => bg.GenreId == genre.ID)"
+                        type="checkbox" 
+                        @onchange="@(e => HandleCheckChange(e, genre))" 
+                        />
+
+                    <span>@genre.Name</span>
+                }
+            </div>
+
+            <a target="_blank" href="AddGenre">Add a new genre</a>
+        </div>
+
+        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="async()=> await UpdateBookAsync()">Save book</button></div>
+        <div class=" w-100 text-center p-5">
+            <div class="alert-success"> @validationMessage</div>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    Book _updatedBook = new();
+
+    List<Author> _authors = new();
+    List<Genre> _genres = new();
+    List<BookGenre> _bookGenres = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get Authors
+        using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        {
+            _authors = await repo.GetAllAuthorsAsync();
+        }
+
+        //Get Genres
+        using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+        {
+            _genres = await repo.GetAllGenreAsync();
+        }
+
+        // Get the Book to update 
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            _updatedBook = await repo.GetBookByIdAsync(Id);
+            _bookGenres = _updatedBook.BookGenres.ToList();
+        }
+    }
+
+    string validationMessage = "";
+    async Task ResetValidationMessage()
+    {
+        await Task.Delay(3000);
+        validationMessage = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task UpdateBookAsync()
+    {
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            await repo.UpdateBookAsync(_updatedBook);
+        }
+
+        validationMessage = "Book updated succesfully";
+        await InvokeAsync(StateHasChanged);
+
+        await ResetValidationMessage();
+    }
+
+    void HandleCheckChange(ChangeEventArgs e, Genre genre)
+    {
+        bool isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+
+
+            _bookGenres.Add(new BookGenre
+                {
+                    BookId = _updatedBook.ID,
+                    GenreId = genre.ID
+                });
+
+            _updatedBook.BookGenres = _bookGenres;
+        }
+        else
+        {
+            _bookGenres.RemoveAll(bg => bg.GenreId == genre.ID);
+            _updatedBook.BookGenres = _bookGenres;
+        }
+    }
+
+}
+   

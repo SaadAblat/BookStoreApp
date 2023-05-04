@@ -1,11 +1,65 @@
 ﻿@page "/ManageBooks"
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
+
+@inject NavigationManager navigationManager
+
 
 <AuthorizeView Roles="Admin">
     <Authorized>
         
+       
+
         <div class="container vh-100 shadow d-flex flex-column w-100 text-center">
             <div class="fs-3"> Manage Books </div>
 
+            <table class="my-4 table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Cover</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Publisher</th>
+                        <th>Price</th>
+                        <th>Stock quantity</th>
+                        <th>Genres</th>
+                        <th>Publication year</th>
+                        <th>ISBN</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @*Loop through each book in the book list*@
+                    @foreach (var book in _books)
+                    {
+                        <tr>
+
+                            <td><img height="200" src="@book.BookCoverUrl" /> </td>
+                            <td>@book.Title</td>
+                            <td>@book.Author.Name</td>
+                            <td>@book.PublisherName</td>
+                            <td>@book.Price</td>
+                            <td>@book.StockQuantity</td>
+                            <td>
+                                @foreach (var genre in book.BookGenres)
+                                {
+                                    <span>@genre.Genre.Name; </span>
+                                }
+                            </td>
+                            <td>@book.PublicationYear</td>
+                            <td>@book.ISBN</td>
+                            <td class="d-flex flex-column flex-nowrap gap-3">
+                                <button @onclick="() => GoToUpdateBookPage(book.ID)" class="btn btn-primary">Update</button>
+                                <button @onclick="() => DeleteBook(book.ID)" class="btn btn-danger">Delete</button>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
             <div class="d-flex flex-column gap-2 my-3">
                 <NavLink class="fs-5" href="AddAuthor">Add a new Author</NavLink>
                 <NavLink class="fs-5" href="AddGenre">Add a new genre</NavLink>
@@ -21,5 +75,35 @@
 
 
 @code {
+    List<Book> _books = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the book list
+
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            _books = await repo.GetAllBooksAsync();
+        }
+    }
+
+    async Task DeleteBook(int id)
+    {
+        if (_books.Any(x=>x.ID == id))
+        {
+            using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+            {
+                _books.Remove(_books.FirstOrDefault(b => b.ID == id));
+                await repo.DeleteBookAsync(id);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+    }
+    void GoToUpdateBookPage(int id)
+    {
+        navigationManager.NavigateTo($"/UpdateBook/{id}");
+    }
+
 
 }
