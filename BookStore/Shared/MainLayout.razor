@@ -3,29 +3,61 @@
 <PageTitle>BookStore</PageTitle>
 
 
-<nav>
-    <div class="d-flex justify-content-between py-3 px-5 border-bottom">
-        <div>Bookstore</div>
-        <div>
-            <div class="w-100 d-flex justify-content-end gap-5">
-                <AuthorizeView Roles="Admin">
-                    <Authorized>
-                        <NavLink class="text-decoration-none" href="ManageBooks">Manage Books</NavLink>
-                    </Authorized>
-                </AuthorizeView>
-                <AuthorizeView>
-                    <Authorized>
-                        <NavLink class="text-decoration-none" href="Identity/Account/Logout">Logout</NavLink>
-                    </Authorized>
-                    <NotAuthorized>
-                        <NavLink class="text-decoration-none" href="Identity/Account/Register">Register</NavLink>
-                        <NavLink class="text-decoration-none" href="Identity/Account/Login">Login</NavLink>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
-        </div>
+<nav class="navbar navbar-expand-lg navbar-light text-black px-5 border-bottom shadow-sm w-100 flex-nowrap">
+    <a class="navbar-brand" href="">Bookstore</a>
+    <div class="d-flex justify-content-end w-100" id="navbar-nav">
+        <ul class="navbar-nav gap-5 d-flex flex-nowrap">
+            <AuthorizeView Roles ="Admin">
+                <Authorized>
+                    <li class="nav-item dropdown">
+                        <a @onclick="ToggleDropDown" role="button" class="nav-link dropdown-toggle">
+                            Admin
+                        </a>
+                        @if (isDropdownOpen)
+                        {
+                            <div class="dropdown-menu drppdwon-menu-right show position-absolute end-0">
+                                <a @onclick="ToggleDropDown" class="dropdown-item" href="ManageBooks">Manage Books </a>
+                                <a @onclick="ToggleDropDown" class="dropdown-item" href="ManageAuthors">Manage Authors </a>
+                                <a @onclick="ToggleDropDown" class="dropdown-item" href="ManageGenres">Manage Genres</a>
+                            </div>
+                        }
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+
+            <AuthorizeView>
+                <Authorized>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Identity/Account/Logout">
+                            Logout
+                        </a>
+                    </li>
+                </Authorized>
+                <NotAuthorized>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Identity/Account/Login">
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Identity/Account/Register">
+                            Register
+                        </a>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+        </ul>
     </div>
 </nav>
 <main>
     @Body
 </main>
+
+@code{
+    private bool isDropdownOpen = false;
+    private void ToggleDropDown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+}

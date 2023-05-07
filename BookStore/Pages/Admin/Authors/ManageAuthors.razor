@@ -1,0 +1,133 @@
+﻿@page "/ManageAuthors"
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
+
+@inject NavigationManager navigationManager
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="container  d-flex flex-column w-100 text-center">
+            <div class="fs-3"> Manage Author </div>
+
+            <div style="max-width:500px;" class="d-flex flex-column gap-2 my-3 align-self-center">
+                <NavLink class="btn btn-success" href="AddAuthor">Add a new Author</NavLink>
+            </div>
+        </div>
+
+
+        <div class="w-100">
+            <SearchBox Items="_authors" OnSearch="UpdateFilteredAuthors"></SearchBox>
+        </div>
+
+
+        <div class="p-3">
+            <table class="my-4 table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>BirthDate</th>
+                        <th>DeathDate</th>
+                        <th>Biography</th>
+                        <th>Books</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @*Loop through each author in the author list*@
+                    @foreach (var author in _filteredAuthors)
+                    {
+                        <tr>
+
+                            <td>@author.Name</td>
+                            <td>@author.BirthDate</td>
+                            <td>@author.DeathDate</td>
+                            <td>@author.Biography</td>
+                            @if (@author.Books != null)
+                            {
+                                <td>
+                                    @foreach (var book in author.Books)
+                                    {
+                                        <span> @book.Title; </span>
+                                    }
+                                </td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                            <td>
+                                <div class="text-center  d-flex flex-column  justify-content-center h-100">
+                                    <button style="min-width:90px" @onclick="() => GoToUpdateAuthorPage(author.ID)" class="btn btn-primary my-1 ">Update</button>
+                                    <button style="min-width:90px" @onclick="() => DeleteAuthor(author.ID)" class="btn btn-danger my-1  ">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <div>Not authorized</div>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    List<Author> _authors = new();
+    List<Author> _filteredAuthors = new();
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the book list
+
+        using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        {
+            _authors = await repo.GetAllAuthorsAsync();
+            _filteredAuthors = _authors.ToList();
+        }
+    }
+
+    async Task DeleteAuthor(int id)
+    {
+        if (_authors.Any(x => x.ID == id))
+        {
+            using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+            {
+                _authors.Remove(_authors.FirstOrDefault(b => b.ID == id));
+                await repo.DeleteAuthorAsync(id);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+    }
+    void GoToUpdateAuthorPage(int id)
+    {
+        navigationManager.NavigateTo($"/UpdateAuthor/{id}");
+    }
+
+    void UpdateFilteredAuthors(string searchTerm)
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            _filteredAuthors = _authors.ToList();
+        }
+        else
+        {
+            _filteredAuthors = _authors.Where(
+
+                author => author.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            )
+
+            .ToList();
+        }
+    }
+
+
+
+
+}

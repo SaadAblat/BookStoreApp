@@ -30,7 +30,7 @@ namespace BookStore.Data.Repositories.Admin
 
         public async Task<List<Author>> GetAllAuthorsAsync()
         {
-            var authors = await _ctx.Authors.ToListAsync();
+            var authors = await _ctx.Authors.Include(a => a.Books).ToListAsync();
             return authors;
         }
 

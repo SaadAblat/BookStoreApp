@@ -10,12 +10,27 @@
 
 <AuthorizeView Roles="Admin">
     <Authorized>
-        
-       
-
-        <div class="container vh-100 shadow d-flex flex-column w-100 text-center">
+        <div class="container  d-flex flex-column w-100 text-center">
             <div class="fs-3"> Manage Books </div>
 
+            <div style="max-width:500px;" class="d-flex flex-column gap-2 my-3 align-self-center">
+                <NavLink class="btn btn-success" href="AddBook">Add a new book</NavLink>
+            </div>
+        </div>
+       
+
+
+
+
+
+
+        
+        <div class="w-100">
+            <SearchBox Items="_books" OnSearch="UpdateFilteredBooks"></SearchBox>
+        </div>
+
+
+        <div class="p-3">
             <table class="my-4 table table-bordered table-striped table-hover">
                 <thead>
                     <tr>
@@ -33,7 +48,7 @@
                 </thead>
                 <tbody>
                     @*Loop through each book in the book list*@
-                    @foreach (var book in _books)
+                    @foreach (var book in _filteredBooks)
                     {
                         <tr>
 
@@ -41,7 +56,7 @@
                             <td>@book.Title</td>
                             <td>@book.Author.Name</td>
                             <td>@book.PublisherName</td>
-                            <td>@book.Price</td>
+                            <td>@book.Price.ToString("C2")</td>
                             <td>@book.StockQuantity</td>
                             <td>
                                 @foreach (var genre in book.BookGenres)
@@ -51,21 +66,19 @@
                             </td>
                             <td>@book.PublicationYear</td>
                             <td>@book.ISBN</td>
-                            <td class="d-flex flex-column flex-nowrap gap-3">
-                                <button @onclick="() => GoToUpdateBookPage(book.ID)" class="btn btn-primary">Update</button>
-                                <button @onclick="() => DeleteBook(book.ID)" class="btn btn-danger">Delete</button>
+                            <td >
+                                <div class="text-center  d-flex flex-column  justify-content-center h-100">
+                                    <button style="min-width:90px" @onclick="() => GoToUpdateBookPage(book.ID)" class="btn btn-primary my-1 ">Update</button>
+                                    <button style="min-width:90px" @onclick="() => DeleteBook(book.ID)" class="btn btn-danger my-1  ">Delete</button>
+                                </div>
+                              
                             </td>
                         </tr>
                     }
-
                 </tbody>
             </table>
-            <div class="d-flex flex-column gap-2 my-3">
-                <NavLink class="fs-5" href="AddAuthor">Add a new Author</NavLink>
-                <NavLink class="fs-5" href="AddGenre">Add a new genre</NavLink>
-                <NavLink class="fs-5" href="AddBook">Add a new book</NavLink>
-            </div>
         </div>
+       
     </Authorized>
 
     <NotAuthorized>
@@ -76,7 +89,7 @@
 
 @code {
     List<Book> _books = new();
-
+    List<Book> _filteredBooks = new();
     protected override async Task OnInitializedAsync()
     {
         // Get the book list
@@ -84,6 +97,7 @@
         using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
         {
             _books = await repo.GetAllBooksAsync();
+            _filteredBooks = _books.ToList();
         }
     }
 
@@ -104,6 +118,26 @@
     {
         navigationManager.NavigateTo($"/UpdateBook/{id}");
     }
+
+    void UpdateFilteredBooks(string searchTerm)
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            _filteredBooks = _books.ToList();
+        }
+        else
+        {
+            _filteredBooks = _books.Where(
+                
+                book => book.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                book.Author.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            )
+            
+            .ToList();
+        }
+    }
+
+
 
 
 }

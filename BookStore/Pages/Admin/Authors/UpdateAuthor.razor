@@ -1,0 +1,84 @@
+﻿@page "/UpdateAuthor/{id:int}"
+@using BookStore.Data;
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+
+@inject IDbContextFactory<DataContext> ContextFactory;
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+
+            <h4>Add a new author</h4>
+
+            @*Author Name*@
+            <label for="name" class="form-label"> name</label>
+            <input id="name" type="text" class="form-input form-control" @bind-value="_updateAuthor.Name"/>
+
+            @*Biography*@
+            <label for="biography" class="form-label"> biography</label>
+            <input id="biography" type="text" class="form-input form-control" @bind-value="_updateAuthor.Biography" />
+
+            @*BirthDate*@
+            <label for="birth-date" class="form-label"> birth date</label>
+            <input id="birth-date" type="number" class="form-input form-control" @bind-value="_updateAuthor.BirthDate" />
+
+            @*Death date*@
+            <label for="death-date" class="form-label"> death date</label>
+            <input id="death-date" type="number" class="form-input form-control" @bind-value="_updateAuthor.DeathDate" />
+
+            @*Nationality*@
+            <label for="death-date" class="form-label"> nationality</label>
+            <input id="death-date" type="text" class="form-input form-control" @bind-value="_updateAuthor.Nationality" />
+        </div>
+
+        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="UpdateAuthorAsync">Save author</button></div>
+        <div class=" w-100 text-center p-5">
+            <div class="alert-success"> @validationMessage</div>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    Author _updateAuthor = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        {
+            _updateAuthor =  await repo.GetAuthorByIdAsync(id);
+        }
+    }
+
+    string validationMessage = "";
+    async Task ResetValidationMessage()
+    {
+        await Task.Delay(3000);
+        validationMessage = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task UpdateAuthorAsync()
+    {
+        using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        {
+            await repo.UpdateAuthorAsync(_updateAuthor);
+        }
+
+        validationMessage = "Author updated succesfully";
+        await InvokeAsync(StateHasChanged);
+       
+        await ResetValidationMessage();
+        
+    }
+
+}

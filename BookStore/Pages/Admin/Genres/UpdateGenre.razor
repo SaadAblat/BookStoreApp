@@ -1,0 +1,73 @@
+﻿@page "/UpdateGenre/{id:int}"
+@using BookStore.Data;
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+
+@inject IDbContextFactory<DataContext> ContextFactory;
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+
+            <h4>Add a new genre</h4>
+
+            @*Genre Name*@
+            <label for="name" class="form-label"> Name</label>
+            <input id="name" type="text" class="form-input form-control" @bind-value="_updatedGenre.Name" />
+
+            @*Description*@
+            <label for="description" class="form-label"> Description</label>
+            <input id="description" type="text" class="form-input form-control" @bind-value="_updatedGenre.Description" />
+
+        </div>
+
+        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="UpdateGenreAsync">Update Genre</button></div>
+        <div class=" w-100 text-center p-5">
+            <div class="alert-success"> @validationMessage</div>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    Genre _updatedGenre = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+        {
+            _updatedGenre = await repo.GetGenreByIdAsync(id);
+        }
+    }
+
+    string validationMessage = "";
+    async Task ResetValidationMessage()
+    {
+        await Task.Delay(3000);
+        validationMessage = "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task UpdateGenreAsync()
+    {
+        using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+        {
+            await repo.UpdateGenreAsync(_updatedGenre);
+        }
+
+        validationMessage = "Genre updated succesfully";
+        await InvokeAsync(StateHasChanged);
+
+        await ResetValidationMessage();
+
+    }
+
+}

@@ -1,0 +1,113 @@
+﻿@page "/ManageGenres"
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
+
+@inject NavigationManager navigationManager
+
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="container  d-flex flex-column w-100 text-center">
+            <div class="fs-3"> Manage Books </div>
+
+            <div style="max-width:500px;" class="d-flex flex-column gap-2 my-3 align-self-center">
+                <NavLink class="btn btn-success" href="AddBook">Add a new book</NavLink>
+            </div>
+        </div>
+
+        <div class="w-100">
+            <SearchBox Items="_genres" OnSearch="UpdateFilteredGenres"></SearchBox>
+        </div>
+
+
+        <div class="p-3">
+            <table class="my-4 table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var genre in _filteredgenres)
+                    {
+                        <tr>
+                            <td>@genre.Name</td>
+                            <td>@genre.Description</td>
+                            <td>
+                                <div class="text-center  d-flex flex-column  justify-content-center h-100">
+                                    <button style="min-width:90px" @onclick="() => GoToUpdateGenrePage(genre.ID)" class="btn btn-primary my-1 ">Update</button>
+                                    <button style="min-width:90px" @onclick="() => DeleteGenre(genre.ID)" class="btn btn-danger my-1  ">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </Authorized>
+
+    <NotAuthorized>
+        <div>Not authorized</div>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    List<Genre> _genres= new();
+    List<Genre> _filteredgenres = new();
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the genre list
+
+        using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+        {
+            _genres = await repo.GetAllGenreAsync();
+            _filteredgenres = _genres.ToList();
+        }
+    }
+
+    async Task DeleteGenre(int id)
+    {
+        if (_genres.Any(x => x.ID == id))
+        {
+            using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+            {
+                _genres.Remove(_genres.FirstOrDefault(b => b.ID == id));
+                await repo.DeleteGenreAsync(id);
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+    }
+    void GoToUpdateGenrePage(int id)
+    {
+        navigationManager.NavigateTo($"/UpdateGenre/{id}");
+    }
+
+    void UpdateFilteredGenres(string searchTerm)
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            _filteredgenres = _genres.ToList();
+        }
+        else
+        {
+            _filteredgenres = _genres.Where(
+
+                genre => genre.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) 
+            )
+
+            .ToList();
+        }
+    }
+
+
+
+
+}

@@ -1,0 +1,33 @@
+﻿@typeparam TEntity
+
+
+<div class="d-flex flex-row gap-3 px-3">
+    <input class="form-control" style="max-width:400px" placeholder="Search..."
+           @bind="searchItem"/>
+
+    <button class="btn btn-success" style="max-width:300px"
+            @onclick=OnSearchClicked
+            >
+       <span class="oi oi-magnifying-glass"></span> Search
+    </button>
+</div>
+
+
+
+
+
+@code {
+    [Parameter]
+    public List<TEntity> Items { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    private string searchItem;
+
+    private async Task OnSearchClicked()
+    {
+        await OnSearch.InvokeAsync(searchItem);
+    }
+
+}
