@@ -69,7 +69,7 @@
                             <td >
                                 <div class="text-center  d-flex flex-column  justify-content-center h-100">
                                     <button style="min-width:90px" @onclick="() => GoToUpdateBookPage(book.ID)" class="btn btn-primary my-1 ">Update</button>
-                                    <button style="min-width:90px" @onclick="() => DeleteBook(book.ID)" class="btn btn-danger my-1  ">Delete</button>
+                                    <button style="min-width:90px" @onclick="async() => await DeleteBook(book.ID)" class="btn btn-danger my-1  ">Delete</button>
                                 </div>
                               
                             </td>
@@ -108,9 +108,15 @@
             using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
             {
                 _books.Remove(_books.FirstOrDefault(b => b.ID == id));
+
                 await repo.DeleteBookAsync(id);
                 await InvokeAsync(StateHasChanged);
             }
+        }
+        if (_filteredBooks.Any(x=>x.ID == id))
+        {
+            _filteredBooks.Remove(_filteredBooks.FirstOrDefault(b => b.ID == id));
+            await InvokeAsync(StateHasChanged);
         }
 
     }

@@ -9,12 +9,12 @@
 
 
 <AuthorizeView Roles="Admin">
-    <Authorized>
+    <Authorized >
         <div class="container  d-flex flex-column w-100 text-center">
-            <div class="fs-3"> Manage Books </div>
+            <div class="fs-3"> Manage Genres </div>
 
             <div style="max-width:500px;" class="d-flex flex-column gap-2 my-3 align-self-center">
-                <NavLink class="btn btn-success" href="AddBook">Add a new book</NavLink>
+                <NavLink class="btn btn-success" href="AddGenre">Add a new Genre</NavLink>
             </div>
         </div>
 
@@ -79,9 +79,15 @@
             using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
             {
                 _genres.Remove(_genres.FirstOrDefault(b => b.ID == id));
+                
                 await repo.DeleteGenreAsync(id);
                 await InvokeAsync(StateHasChanged);
             }
+        }
+        if (_filteredgenres.Any(x => x.ID == id))
+        {
+            _filteredgenres.Remove(_filteredgenres.FirstOrDefault(b => b.ID == id));
+            await InvokeAsync(StateHasChanged);
         }
 
     }

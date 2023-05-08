@@ -5,14 +5,16 @@ namespace BookStore.Entities
     public class Author
     {
         public int ID { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Biography is required.")]
         public string Biography { get; set; }
-        [Required]
+
+
+        [Required(ErrorMessage = "Birth Date is required.")]
         public int BirthDate { get; set; }
         public int DeathDate { get; set; }
-         [Required]
+        [Required(ErrorMessage = "Nationality is required.")]
         public string Nationality { get; set; }
         public ICollection<Book> Books { get; set; }
     }

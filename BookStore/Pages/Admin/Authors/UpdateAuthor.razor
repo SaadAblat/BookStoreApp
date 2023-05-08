@@ -7,40 +7,52 @@
 @inject IDbContextFactory<DataContext> ContextFactory;
 
 <AuthorizeView Roles="Admin">
-    <Authorized>
+    <Authorized Context="authContext">
         <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+            <h4>Update author</h4>
+             <EditForm Model="_updateAuthor" OnValidSubmit="UpdateAuthorAsync">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-            <h4>Add a new author</h4>
+                @*Author Name*@
+                <label for="name" class="form-label"> name</label>
+                <InputText id="name"  class="form-input form-control" @bind-Value="_updateAuthor.Name" />
+                <ValidationMessage For="@(() => _updateAuthor.Name)" />
 
-            @*Author Name*@
-            <label for="name" class="form-label"> name</label>
-            <input id="name" type="text" class="form-input form-control" @bind-value="_updateAuthor.Name"/>
 
-            @*Biography*@
-            <label for="biography" class="form-label"> biography</label>
-            <input id="biography" type="text" class="form-input form-control" @bind-value="_updateAuthor.Biography" />
+                @*Biography*@
+                <label for="biography" class="form-label"> biography</label>
+                <InputText id="biography" class="form-input form-control" @bind-Value="_updateAuthor.Biography" />
+                <ValidationMessage For="@(() => _updateAuthor.Biography)" />
 
-            @*BirthDate*@
-            <label for="birth-date" class="form-label"> birth date</label>
-            <input id="birth-date" type="number" class="form-input form-control" @bind-value="_updateAuthor.BirthDate" />
+                @*BirthDate*@
+                <label for="birth-date" class="form-label"> birth date</label>
+                <InputNumber id="birth-date" class="form-input form-control" @bind-Value="_updateAuthor.BirthDate" />
+                <ValidationMessage For="@(() => _updateAuthor.BirthDate)" />
 
-            @*Death date*@
-            <label for="death-date" class="form-label"> death date</label>
-            <input id="death-date" type="number" class="form-input form-control" @bind-value="_updateAuthor.DeathDate" />
+                @*Death date*@
+                <label for="death-date" class="form-label"> death date</label>
+                <InputNumber id="death-date" class="form-input form-control" @bind-Value="_updateAuthor.DeathDate" />
 
-            @*Nationality*@
-            <label for="death-date" class="form-label"> nationality</label>
-            <input id="death-date" type="text" class="form-input form-control" @bind-value="_updateAuthor.Nationality" />
+                @*Nationality*@
+                <label for="death-date" class="form-label"> nationality</label>
+                <InputText id="death-date"  class="form-input form-control" @bind-Value="_updateAuthor.Nationality" />
+                <ValidationMessage For="@(() => _updateAuthor.Nationality)" />
+
+
+                <div class="w-100 text-center p-5">
+                    <button class="btn btn-success btn-lg" type="submit">Save author</button>
+                </div>
+
+                <div class=" w-100 text-center p-5">
+                    <div class="alert-success"> @validationMessage</div>
+                </div>
+            </EditForm>
         </div>
 
-        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="UpdateAuthorAsync">Save author</button></div>
-        <div class=" w-100 text-center p-5">
-            <div class="alert-success"> @validationMessage</div>
-        </div>
     </Authorized>
 
     <NotAuthorized>
-
     </NotAuthorized>
 </AuthorizeView>
 

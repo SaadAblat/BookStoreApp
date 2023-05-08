@@ -32,6 +32,7 @@
                         <th>BirthDate</th>
                         <th>DeathDate</th>
                         <th>Biography</th>
+                        <th>Nationality</th>
                         <th>Books</th>
                         <th>Actions</th>
                     </tr>
@@ -46,6 +47,7 @@
                             <td>@author.BirthDate</td>
                             <td>@author.DeathDate</td>
                             <td>@author.Biography</td>
+                            <td>@author.Nationality</td>
                             @if (@author.Books != null)
                             {
                                 <td>
@@ -102,6 +104,11 @@
                 await repo.DeleteAuthorAsync(id);
                 await InvokeAsync(StateHasChanged);
             }
+        }
+        if (_filteredAuthors.Any(x => x.ID == id))
+        {
+            _filteredAuthors.Remove(_filteredAuthors.FirstOrDefault(b => b.ID == id));
+            await InvokeAsync(StateHasChanged);
         }
 
     }

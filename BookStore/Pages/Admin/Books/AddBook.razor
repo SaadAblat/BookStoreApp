@@ -7,72 +7,78 @@
 @inject IDbContextFactory<DataContext> ContextFactory;
 
 <AuthorizeView Roles="Admin">
-    <Authorized>
+    <Authorized Context="authContext">
         <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+            <EditForm Model="_createdBook" OnValidSubmit="SaveBookAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-            <h4>Add a new Book</h4>
+                <h4>Add a new Book</h4>
 
-            @*Book Title*@
-            <label for="title" class="form-label">Title</label>
-            <input id="title" type="text" class="form-control" @bind-value="_createdBook.Title" />
+                @*Book Title*@
+                <label for="title" class="form-label">Title</label>
+                <InputText id="title" class="form-control" @bind-Value="_createdBook.Title" />
+                <ValidationMessage For="@(() => _createdBook.Title)" />
 
-            @*AuthorId*@
-            <label for="author" class="form-label">Aurthor</label>
-            <select class="form-select form-control" id="author" @bind="_createdBook.AuthorId">
-                <option value="">
-                    Select an author
-                </option>
-                
-                @foreach (var author in _authors)
-                {
-                    <option value="@author.ID">@author.Name</option>
-                }
-            </select>
-            <a target="_blank" href="AddAuthor">Add a new author</a>
+                @*AuthorId*@
+                <label for="author" class="form-label">Author</label>
+                <InputSelect class="form-select form-control" id="author" @bind-Value="_createdBook.AuthorId">
+                    @foreach (var author in _authors)
+                    {
+                        <option value="@author.ID">@author.Name</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => _createdBook.AuthorId)" />
+                <a target="_blank" href="AddAuthor">Add a new author</a>
 
-            @*Book ISBN*@
-            <label for="isbn" class="form-label">ISBN</label>
-            <input id="isbn" type="text" class="form-control" @bind-value="_createdBook.ISBN" />
+                @*Book ISBN*@
+                <label for="isbn" class="form-label">ISBN</label>
+                <InputText id="isbn" class="form-control" @bind-Value="_createdBook.ISBN" />
+                <ValidationMessage For="@(() => _createdBook.ISBN)" />
 
-            @*PublisherName*@
-            <label for="publisher-name" class="form-label">Publisher name</label>
-            <input id="publisher-name" type="text" class="form-control" @bind-value="_createdBook.PublisherName" />
+                @*PublisherName*@
+                <label for="publisher-name" class="form-label">Publisher name</label>
+                <InputText id="publisher-name" class="form-control" @bind-Value="_createdBook.PublisherName" />
+                <ValidationMessage For="@(() => _createdBook.PublisherName)" />
 
-            @*PublicationYear*@
-            <label for="publication-year" class="form-label">Publication Year</label>
-            <input id="publication-year" type="number" class="form-control" @bind-value="_createdBook.PublicationYear" />
+                @*PublicationYear*@
+                <label for="publication-year" class="form-label">Publication Year</label>
+                <InputNumber id="publication-year" class="form-control" @bind-Value="_createdBook.PublicationYear" />
+                <ValidationMessage For="@(() => _createdBook.PublicationYear)" />
 
-            @*Price*@
-            <label for="price" class="form-label">Price</label>
-            <input id="price" type="number" class="form-control" @bind-value="_createdBook.Price" />
+                @*Price*@
+                <label for="price" class="form-label">Price</label>
+                <InputNumber id="price" class="form-control" @bind-Value="_createdBook.Price" />
+                <ValidationMessage For="@(() => _createdBook.Price)" />
 
-            @*StockQuantity*@
-            <label for="stock-quantity" class="form-label">Stock quantity</label>
-            <input id="stock-quantity" type="number" class="form-control" @bind-value="_createdBook.StockQuantity" />
+                @*StockQuantity*@
+                <label for="stock-quantity" class="form-label">Stock quantity</label>
+                <InputNumber id="stock-quantity" class="form-control" @bind-Value="_createdBook.StockQuantity" />
+                <ValidationMessage For="@(() => _createdBook.StockQuantity)" />
 
-            @*BookCoverUrl*@
-            <label for="book-cover-url" class="form-label">Book cover url</label>
-            <input id="book-cover-url" type="text" class="form-control" @bind-value="_createdBook.BookCoverUrl" />
+                @*BookCoverUrl*@
+                <label for="book-cover-url" class="form-label">Book cover url</label>
+                <InputText id="book-cover-url" class="form-control" @bind-Value="_createdBook.BookCoverUrl" />
+                <ValidationMessage For="@(() => _createdBook.BookCoverUrl)" />
 
-            @*Book Genres*@
-            <div class="d-flex gap-4 flex-wrap my-3"> 
+                @*Book Genres*@
+                <div class="d-flex gap-4 flex-wrap my-3">
+                    @foreach(var genre in _genres)
+                    {
+                        <input type="checkbox" @onchange="@(e => HandleCheckChange(e, genre))" />
+                        <span>@genre.Name</span>                
+                    }                
+        </div>  
+        <a target="_blank" href="AddGenre">Add a new genre</a>
 
-
-
-                @foreach(var genre in _genres)
-                {
-                    <input type="checkbox" @onchange="@(e => HandleCheckChange(e, genre))" />
-                    <span>@genre.Name</span>
-                }
+            <div class="w-100 text-center p-5">
+                <button type="submit" class="btn btn-success btn-lg">Save book</button>
             </div>
-
-            <a target="_blank" href="AddGenre">Add a new genre</a>
-        </div>
-
-        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="SaveBookAsync">Save book</button></div>
-        <div class=" w-100 text-center p-5">
-            <div class="alert-success"> @validationMessage</div>
-        </div>
+                <div class=" w-100 text-center p-5">
+                    <div class="alert-success"> @validationMessage</div>
+                </div>
+        </EditForm>
+         </div>
     </Authorized>
 
     <NotAuthorized>
@@ -126,7 +132,7 @@
 
         _createdBook = new Book();
 
-        validationMessage = "Author added succesfully";
+        validationMessage = "Book added successfully";
         await InvokeAsync(StateHasChanged);
 
         await ResetValidationMessage();

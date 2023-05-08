@@ -7,25 +7,34 @@
 @inject IDbContextFactory<DataContext> ContextFactory;
 
 <AuthorizeView Roles="Admin">
-    <Authorized>
-        <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+    <Authorized Context="AuthContext">
 
-            <h4>Add a new genre</h4>
 
-            @*Genre Name*@
-            <label for="name" class="form-label"> Name</label>
-            <input id="name" type="text" class="form-input form-control" @bind-value="_updatedGenre.Name" />
+        <EditForm Model="_updatedGenre" OnValidSubmit="UpdateGenreAsync">
 
-            @*Description*@
-            <label for="description" class="form-label"> Description</label>
-            <input id="description" type="text" class="form-input form-control" @bind-value="_updatedGenre.Description" />
+            <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
 
-        </div>
+                <h4>Add a new genre</h4>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-        <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg" @onclick="UpdateGenreAsync">Update Genre</button></div>
-        <div class=" w-100 text-center p-5">
-            <div class="alert-success"> @validationMessage</div>
-        </div>
+                @*Genre Name*@
+                <label for="name" class="form-label"> Name</label>
+                <InputText id="name" class="form-input form-control" @bind-Value="_updatedGenre.Name" />
+                <ValidationMessage For="@(() => _updatedGenre.Name)" />
+
+                @*Description*@
+                <label for="description" class="form-label"> Description</label>
+                <InputText id="description" class="form-input form-control" @bind-Value="_updatedGenre.Description" />
+                <ValidationMessage For="@(() => _updatedGenre.Description)" />
+
+
+            </div>
+            <div class="w-100 text-center p-5"> <button class="btn btn-success btn-lg">Save Genre</button></div>
+            <div class=" w-100 text-center p-5">
+                <div class="alert-success"> @validationMessage</div>
+            </div>
+        </EditForm>
     </Authorized>
 
     <NotAuthorized>
