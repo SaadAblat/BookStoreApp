@@ -1,5 +1,7 @@
 ﻿@page
+@using Microsoft.AspNetCore.Components;
 @model BookStore.Areas.Identity.Pages.Account.LoginModel
+
 
 <div class="col-xs-1 " align="center">
 
@@ -27,6 +29,12 @@
                 <div>
                     <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mt-4">Log in</button>
                 </div>
+
+                <div class="w-100 my-3 text-center">
+                    <a class="m-3" href="~/Identity/Account/Register">Register a new account</a>
+                </div>
+
+               
             </form>
         </section>
     </div>

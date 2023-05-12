@@ -12,21 +12,30 @@
 
         <EditForm Model="_createdGenre" OnValidSubmit="SaveGenreAsync">
 
-            <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+            <div class="form-control d-flex flex-column m-auto p-5 m-3" style="max-width:900px">
 
                 <h4>Add a new genre</h4>
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 @*Genre Name*@
-                <label for="name" class="form-label"> Name</label>
+                <label  for="name" class="form-label mt-3"> Name</label>
                 <InputText id="name" class="form-input form-control" @bind-Value="_createdGenre.Name" />
                 <ValidationMessage For="@(() => _createdGenre.Name)" />
 
                 @*Description*@
-                <label for="description" class="form-label"> Description</label>
+                <label for="description" class="form-label mt-3"> Description</label>
                 <InputText id="description" class="form-input form-control" @bind-Value="_createdGenre.Description" />
                 <ValidationMessage For="@(() => _createdGenre.Description)" />
+
+                @*IsFiction*@
+                <div class="d-flex flex-row gap-5  mt-3">
+
+                    <label for="description" class="form-label"> Is Fiction?</label>
+                    <InputCheckbox id="description" class="form-check  " @bind-Value="_createdGenre.IsFiction" />
+                    <ValidationMessage For="@(() => _createdGenre.IsFiction)" />
+                </div>
+
 
 
             </div>

@@ -12,7 +12,7 @@
 
         <EditForm Model="_updatedGenre" OnValidSubmit="UpdateGenreAsync">
 
-            <div class="form-control d-flex flex-column m-auto  p-5 m-3" style="max-width:900px">
+            <div class="form-control d-flex flex-column m-auto p-5 m-3" style="max-width:900px">
 
                 <h4>Add a new genre</h4>
                 <DataAnnotationsValidator />
@@ -27,6 +27,13 @@
                 <label for="description" class="form-label"> Description</label>
                 <InputText id="description" class="form-input form-control" @bind-Value="_updatedGenre.Description" />
                 <ValidationMessage For="@(() => _updatedGenre.Description)" />
+
+                @*IsFiction*@
+                <div class="d-flex flex-row gap-5  mt-3">
+                    <label for="description" class="form-label"> Is Fiction?</label>
+                    <InputCheckbox id="description" class="form-check  " @bind-Value="_updatedGenre.IsFiction" />
+                    <ValidationMessage For="@(() => _updatedGenre.IsFiction)" />
+                </div>
 
 
             </div>

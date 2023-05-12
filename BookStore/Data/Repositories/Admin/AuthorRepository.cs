@@ -25,7 +25,7 @@ namespace BookStore.Data.Repositories.Admin
 
         public async Task<Author> GetAuthorByIdAsync(int id)
         {
-            return await _ctx.Authors.FindAsync(id);
+            return await _ctx.Authors.Include(a => a.Books).FirstAsync(a => a.ID == id);
         }
 
         public async Task<List<Author>> GetAllAuthorsAsync()

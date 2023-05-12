@@ -19,6 +19,8 @@ namespace BookStore.Entities
 
         public string? ISBN { get; set; }
 
+        public string? Description { get; set; }
+
         [Required(ErrorMessage = "PublisherName is required.")]
         public string? PublisherName { get; set; }
 

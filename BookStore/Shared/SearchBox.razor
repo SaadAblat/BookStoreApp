@@ -2,13 +2,12 @@
 
 
 <div class="d-flex flex-row gap-3 px-3">
-    <input class="form-control" style="max-width:400px" placeholder="Search..."
+    <input class="form-control form-control-sm" style="max-width:400px;  font-size:12px" placeholder="Search..."
            @bind="searchItem"/>
 
-    <button class="btn btn-success" style="max-width:300px"
-            @onclick=OnSearchClicked
-            >
-       <span class="oi oi-magnifying-glass"></span> Search
+    <button class="btn btn-sm btn-success" style="max-width:300px ; font-size:12px"
+            @onclick=OnSearchClicked>
+       <span class="oi oi-magnifying-glass fs-6"></span> Search
     </button>
 </div>
 

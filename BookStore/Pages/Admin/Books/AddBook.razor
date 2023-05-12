@@ -29,12 +29,17 @@
                     }
                 </InputSelect>
                 <ValidationMessage For="@(() => _createdBook.AuthorId)" />
-                <a target="_blank" href="AddAuthor">Add a new author</a>
+                <a class="d-block"target="_blank" href="AddAuthor">Add a new author</a>
 
                 @*Book ISBN*@
                 <label for="isbn" class="form-label">ISBN</label>
                 <InputText id="isbn" class="form-control" @bind-Value="_createdBook.ISBN" />
                 <ValidationMessage For="@(() => _createdBook.ISBN)" />
+
+                @*Book Description*@
+                <label for="description" class="form-label">Description</label>
+                <InputText id="description" class="form-control" @bind-Value="_createdBook.Description" />
+                <ValidationMessage For="@(() => _createdBook.Description)" />
 
                 @*PublisherName*@
                 <label for="publisher-name" class="form-label">Publisher name</label>
@@ -57,19 +62,30 @@
                 <ValidationMessage For="@(() => _createdBook.StockQuantity)" />
 
                 @*BookCoverUrl*@
-                <label for="book-cover-url" class="form-label">Book cover url</label>
-                <InputText id="book-cover-url" class="form-control" @bind-Value="_createdBook.BookCoverUrl" />
-                <ValidationMessage For="@(() => _createdBook.BookCoverUrl)" />
+
+                <div class="d-flex flex-row w-100 justify-content-between ">
+                    <div class="d-flex flex-column w-75">
+                        <label for="book-cover-url" class="form-label fw-bold">Book cover url</label>
+                        <InputText id="book-cover-url" class="form-control" @bind-Value="_createdBook.BookCoverUrl" />
+                        <ValidationMessage For="@(() => _createdBook.BookCoverUrl)" />
+                    </div>
+
+                    <img height="200" src="@_createdBook.BookCoverUrl" />
+                </div>
 
                 @*Book Genres*@
-                <div class="d-flex gap-4 flex-wrap my-3">
-                    @foreach(var genre in _genres)
+                <div class="d-flex flex-column flex-wrap my-1 align-content-start">
+                    <div class="fw-bold">Select a book genre</div>
+                    @foreach (var genre in _genres)
                     {
-                        <input type="checkbox" @onchange="@(e => HandleCheckChange(e, genre))" />
-                        <span>@genre.Name</span>                
-                    }                
-        </div>  
-        <a target="_blank" href="AddGenre">Add a new genre</a>
+                        <div class="d-flex justify-content-end gap-4">
+                            <label for="@genre.Name">@genre.Name</label>
+                            <input id="@genre.Name" type="checkbox" @onchange="@(e => HandleCheckChange(e, genre))" />
+                        </div>
+                    }
+                </div>
+
+                <a target="_blank" href="AddGenre">Add a new genre</a>
 
             <div class="w-100 text-center p-5">
                 <button type="submit" class="btn btn-success btn-lg">Save book</button>
@@ -131,6 +147,7 @@
         }
 
         _createdBook = new Book();
+        _bookgenres = new List<BookGenre>();
 
         validationMessage = "Book added successfully";
         await InvokeAsync(StateHasChanged);

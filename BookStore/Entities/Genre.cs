@@ -12,6 +12,8 @@ namespace BookStore.Entities
         [Required(ErrorMessage = "Description is required.")]
         public string Description { get; set; }
         public ICollection<BookGenre> BookGenres { get; set; }
+
+        public bool IsFiction { get; set; }
     }
 
 }

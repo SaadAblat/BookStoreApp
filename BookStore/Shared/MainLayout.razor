@@ -1,63 +1,85 @@
 ﻿@inherits LayoutComponentBase
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
 
+@inject NavigationManager navigationManager
 <PageTitle>BookStore</PageTitle>
 
 
-<nav class="navbar navbar-expand-lg navbar-light text-black px-5 border-bottom shadow-sm w-100 flex-nowrap">
-    <a class="navbar-brand" href="">Bookstore</a>
-    <div class="d-flex justify-content-end w-100" id="navbar-nav">
-        <ul class="navbar-nav gap-5 d-flex flex-nowrap">
-            <AuthorizeView Roles ="Admin">
-                <Authorized>
-                    <li class="nav-item dropdown">
-                        <a @onclick="ToggleDropDown" role="button" class="nav-link dropdown-toggle">
-                            Admin
-                        </a>
-                        @if (isDropdownOpen)
+
+
+
+<div id="top-nav" class="fs-big">
+    
+
+    <div id="brand-genres" class="nav-group ">
+        <a  href="" id="brand">Bookstore</a>
+    </div>
+
+    <div id="accounts" class="nav-group">
+
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <div class="">
+                    <div @onclick="ToggleAdminDropDown" role="button" class="dropdown-toggle">
+                        Admin
+                        @if (isAdminDropdownOpen)
                         {
-                            <div class="dropdown-menu drppdwon-menu-right show position-absolute end-0">
-                                <a @onclick="ToggleDropDown" class="dropdown-item" href="ManageBooks">Manage Books </a>
-                                <a @onclick="ToggleDropDown" class="dropdown-item" href="ManageAuthors">Manage Authors </a>
-                                <a @onclick="ToggleDropDown" class="dropdown-item" href="ManageGenres">Manage Genres</a>
+                            <div class="dropdown-menu drppdwon-menu-right show position-absolute">
+                                <a class="dropdown-item" href="ManageBooks">Manage Books </a>
+                                <a class="dropdown-item" href="ManageAuthors">Manage Authors </a>
+                                <a class="dropdown-item" href="ManageGenres">Manage Genres</a>
                             </div>
                         }
-                    </li>
-                </Authorized>
-            </AuthorizeView>
+                    </div>
+                    
+                </div>
+            </Authorized>
+        </AuthorizeView>
 
-            <AuthorizeView>
-                <Authorized>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Identity/Account/Logout">
-                            Logout
-                        </a>
-                    </li>
-                </Authorized>
-                <NotAuthorized>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Identity/Account/Login">
-                            Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Identity/Account/Register">
-                            Register
-                        </a>
-                    </li>
-                </NotAuthorized>
-            </AuthorizeView>
-        </ul>
+        <AuthorizeView>
+            <Authorized>
+                
+                <div class="">
+                    <a class="" href="">
+                        <i class="oi oi-cart"></i>
+                    </a>
+                </div>
+                <div class="">
+                    <a class="" href="Identity/Account/Logout">
+                        <i class="oi oi-account-logout"></i>
+                    </a>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <div class="">
+                    <a class="" href="Identity/Account/Login">
+                        <i class="oi oi-person"></i>
+                    </a>
+                </div>
+                
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
-</nav>
+
+</div>
+
 <main>
     @Body
 </main>
 
 @code{
-    private bool isDropdownOpen = false;
-    private void ToggleDropDown()
+    private bool isAdminDropdownOpen = false;
+    private void ToggleAdminDropDown()
     {
-        isDropdownOpen = !isDropdownOpen;
+        isAdminDropdownOpen = !isAdminDropdownOpen;
     }
+
+
+
+
 
 }

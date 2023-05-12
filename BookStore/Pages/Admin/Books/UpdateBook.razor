@@ -18,12 +18,12 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                  @*Book Title*@
-                    <label for="title" class="form-label">Title</label>
+                <label for="title" class="form-label fw-bold">Title</label>
                     <InputText id="title" class="form-control" @bind-Value="_updatedBook.Title" />
                     <ValidationMessage For="@(() => _updatedBook.Title)" />
 
                                     @*AuthorId*@
-                <label for="author" class="form-label">Author</label>
+                <label for="author" class="form-label fw-bold">Author</label>
                 <InputSelect class="form-select form-control" id="author" @bind-Value="_updatedBook.AuthorId">
                     <option value="">
                         Select an author
@@ -34,30 +34,35 @@
                     }
                 </InputSelect>
                 <ValidationMessage For="@(() => _updatedBook.AuthorId)" />
-                <a target="_blank" href="AddAuthor">Add a new author</a>
+                <a class="d-block my-2" target="_blank" href="AddAuthor">Add a new author</a>
 
                 @*Book ISBN*@
-                <label for="isbn" class="form-label">ISBN</label>
+                <label for="isbn" class="form-label fw-bold">ISBN</label>
                 <InputText id="isbn" class="form-control" @bind-Value="_updatedBook.ISBN" />
                 <ValidationMessage For="@(() => _updatedBook.ISBN)" />
 
+                @*Book Description*@
+                <label for="description" class="form-label">Description</label>
+                <InputText id="description" class="form-control" @bind-Value="_updatedBook.Description" />
+                <ValidationMessage For="@(() => _updatedBook.Description)" />
+
                 @*PublisherName*@
-                <label for="publisher-name" class="form-label">Publisher name</label>
+                <label for="publisher-name" class="form-label fw-bold">Publisher name</label>
                 <InputText id="publisher-name" class="form-control" @bind-Value="_updatedBook.PublisherName" />
                 <ValidationMessage For="@(() => _updatedBook.PublisherName)" />
 
                 @*PublicationYear*@
-                <label for="publication-year" class="form-label">Publication Year</label>
+                <label for="publication-year" class="form-label fw-bold">Publication Year</label>
                 <InputNumber id="publication-year" class="form-control" @bind-Value="_updatedBook.PublicationYear" />
                 <ValidationMessage For="@(() => _updatedBook.PublicationYear)" />
 
                 @*Price*@
-                <label for="price" class="form-label">Price</label>
+                <label for="price" class="form-label fw-bold">Price</label>
                 <InputNumber id="price" class="form-control" @bind-Value="_updatedBook.Price" />
                 <ValidationMessage For="@(() => _updatedBook.Price)" />
 
                 @*StockQuantity*@
-                <label for="stock-quantity" class="form-label">Stock quantity</label>
+                <label for="stock-quantity" class="form-label fw-bold ">Stock quantity</label>
                 <InputNumber id="stock-quantity" class="form-control" @bind-Value="_updatedBook.StockQuantity" />
                 <ValidationMessage For="@(() => _updatedBook.StockQuantity)" />
 
@@ -65,7 +70,7 @@
             
                     <div class="d-flex flex-row w-100 justify-content-between ">
                         <div class="d-flex flex-column w-75">
-                           <label for="book-cover-url" class="form-label">Book cover url</label>
+                        <label for="book-cover-url" class="form-label fw-bold">Book cover url</label>
                              <InputText id="book-cover-url" class="form-control" @bind-Value="_updatedBook.BookCoverUrl" />
                               <ValidationMessage For="@(() => _updatedBook.BookCoverUrl)" />
                         </div>
@@ -75,17 +80,22 @@
            
 
                     @*Book Genres*@
-                    <div class="d-flex gap-4 flex-wrap my-3">
-
+                <div class="d-flex flex-column flex-wrap my-1 align-content-start">
+                    <div class="fw-bold">Select a book genre</div>
                         @foreach (var genre in _genres)
-                        {
-                            <input
-                                checked ="@_updatedBook.BookGenres.Any(bg => bg.GenreId == genre.ID)"
-                                type="checkbox" 
-                                @onchange="@(e => HandleCheckChange(e, genre))" 
-                                />
+                    {
+                        <div class="d-flex justify-content-end gap-4">
+                            <label for="@genre.Name">@genre.Name</label>
+                            <input id="@genre.Name"
+                                   checked="@_updatedBook.BookGenres.Any(bg => bg.GenreId == genre.ID)"
+                                   type="checkbox"
+                                   class="form-check"
+                               @onchange="@(e => HandleCheckChange(e, genre))" />
+                            </div>
 
-                            <span>@genre.Name</span>
+           
+
+                           
                         }
                     </div>
 

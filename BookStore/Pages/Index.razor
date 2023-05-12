@@ -1,3 +1,170 @@
 ﻿@page "/"
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
 
+@inject NavigationManager navigationManager
 <PageTitle>Index</PageTitle>
+
+
+
+<div id="top-nav" class="fs-small">
+    <div @onclick="AllBooks" role="button" class="m-auto">All Books</div>
+    <div @onclick="ToggleFictionDropDown" role="button" class="m-auto dropdown-toggle">
+        Fiction
+        @if (isFictionDropdownOpen)
+        {
+
+            <div class="dropdown-menu drppdwon-menu-right show position-absolute">
+                @foreach (var genre in _genres)
+                {
+                    if (genre.IsFiction)
+                    {
+                        <div @onclick="async ()=>await SelectGenre(genre)" class="dropdown-item fs-small">@genre.Name</div>
+                    }
+                }
+            </div>
+        }
+    </div>
+    <div @onclick="ToggleNonFictionDropDown" role="button" class="m-auto dropdown-toggle">
+        Non Fiction
+        @if (isNonFictionDropdownOpen)
+        {
+            <div class="dropdown-menu drppdwon-menu-right show position-absolute">
+                @foreach (var genre in _genres)
+                {
+                    if (!genre.IsFiction)
+                    {
+                        <div @onclick="async()=>await SelectGenre(genre)" class="dropdown-item fs-small">@genre.Name</div>
+                    }
+
+                }
+            </div>
+        }
+    </div>
+    <div class="w-100 ">
+        <SearchBox Items="_books" OnSearch="UpdateFilteredBooks"></SearchBox>
+    </div>
+
+
+</div>
+
+<div class="page-container">
+    @if (_selectedGenre.Name != null)
+    {
+        <div class="genre my-5">
+            <div class="genre-title fs-big my-2">@_selectedGenre.Name</div>
+            <div class="genre-description fs-small">@_selectedGenre.Description</div>
+        </div>
+    }
+    else
+    {
+        <div class="genre my-5">
+            <div class="genre-title fs-big my-2">All books</div>
+        </div>
+    }
+
+
+    <div id="books">
+
+        @foreach (var book in _filteredBooks)
+        {
+
+            <div class="book-container">
+                <img role="button" @onclick="()=>GoToBookPage(book.ID)" src="@book.BookCoverUrl" class="book-cover">
+                <div role="button" @onclick="()=>GoToBookPage(book.ID)" class="book-title fs-normal fw-bold">@book.Title</div>
+                <div role="button" @onclick="()=>GoToAuthorPage(book.Author.ID)" class="book-author fs-small">
+                    @book.Author.Name
+                </div>
+                <div class="book-price fs-normal align-self-center my-2">@book.Price.ToString("C2")</div>
+                <button class="btn btn-success btn-sm mb-3">Add to cart</button>
+            </div>
+        }
+
+    </div>
+
+</div>
+
+
+
+
+
+@code {
+
+    private bool isFictionDropdownOpen = false;
+    private void ToggleFictionDropDown()
+    {
+        isFictionDropdownOpen = !isFictionDropdownOpen;
+        isNonFictionDropdownOpen = false;
+    }
+
+    private bool isNonFictionDropdownOpen = false;
+    private void ToggleNonFictionDropDown()
+    {
+        isNonFictionDropdownOpen = !isNonFictionDropdownOpen;
+        isFictionDropdownOpen = false;
+    }
+
+    List<Book> _books = new();
+    List<Book> _filteredBooks = new();
+    List<Genre> _genres = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the book list
+
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            _books = await repo.GetAllBooksAsync();
+            _filteredBooks = _books.ToList();
+        }
+        using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
+        {
+            _genres = await repo.GetAllGenreAsync();
+        }
+    }
+
+    Genre _selectedGenre = new();
+
+    async Task SelectGenre(Genre genre)
+    {
+        _selectedGenre = genre;
+        _filteredBooks = _books.Where(b => b.BookGenres.Any(bg => bg.Genre.ID == _selectedGenre.ID)).ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void UpdateFilteredBooks(string searchTerm)
+    {
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            _filteredBooks = _books.Where(
+
+                book => book.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                book.Author.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            )
+
+            .ToList();
+        }
+    }
+
+    void AllBooks()
+    {
+        _filteredBooks = _books.ToList();
+        _selectedGenre = new Genre();
+    }
+
+
+    void GoToAuthorPage(int id)
+    {
+        navigationManager.NavigateTo($"/AuthorPage/{id}");
+    }
+
+    void GoToBookPage(int id)
+    {
+        navigationManager.NavigateTo($"/BookPage/{id}");
+    }
+}
+
