@@ -1,29 +1,24 @@
-#top-nav
-{
-    position:relative;
-    top:0;
-    display:flex;
-    justify-content:space-between;
-    padding-block:10px;
-    padding-inline:50px;
-    border-bottom:solid 1px gray;
-
-    
+﻿#top-nav {
+    position: relative;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    padding-block: 10px;
+    padding-inline: 50px;
+    border-bottom: solid 1px gray;
 }
 
-a{
-    text-decoration:none;
-
+a {
+    text-decoration: none;
 }
 
 .nav-group {
     display: flex;
-    gap:30px;
+    gap: 30px;
 }
 
 
-#brand-genres {
-    
+#brand {
     justify-content: start;
 }
 
@@ -42,8 +37,3 @@ a{
 .fs-big {
     font-size: 16px;
 }
-
-
-
-
-

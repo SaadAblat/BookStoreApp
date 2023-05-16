@@ -37,8 +37,8 @@
                 <ValidationMessage For="@(() => _createdBook.ISBN)" />
 
                 @*Book Description*@
-                <label for="description" class="form-label">Description</label>
-                <InputText id="description" class="form-control" @bind-Value="_createdBook.Description" />
+                <label for="description" class="form-label fw-bold">Description</label>
+                <InputTextArea id="description" class="form-control" @bind-Value="_createdBook.Description" />
                 <ValidationMessage For="@(() => _createdBook.Description)" />
 
                 @*PublisherName*@

@@ -1,22 +1,13 @@
 ﻿@inherits LayoutComponentBase
-@using BookStore.Data.Repositories.Admin;
-@using BookStore.Data;
-@using BookStore.Entities;
-@using Microsoft.EntityFrameworkCore;
-@inject IDbContextFactory<DataContext> ContextFactory
 
-@inject NavigationManager navigationManager
 <PageTitle>BookStore</PageTitle>
 
 
-
-
-
 <div id="top-nav" class="fs-big">
-    
+
 
     <div id="brand-genres" class="nav-group ">
-        <a  href="" id="brand">Bookstore</a>
+        <a href="" id="brand">Bookstore</a>
     </div>
 
     <div id="accounts" class="nav-group">
@@ -35,14 +26,14 @@
                             </div>
                         }
                     </div>
-                    
+
                 </div>
             </Authorized>
         </AuthorizeView>
 
         <AuthorizeView>
             <Authorized>
-                
+
                 <div class="">
                     <a class="" href="">
                         <i class="oi oi-cart"></i>
@@ -60,7 +51,7 @@
                         <i class="oi oi-person"></i>
                     </a>
                 </div>
-                
+
             </NotAuthorized>
         </AuthorizeView>
     </div>
@@ -71,15 +62,11 @@
     @Body
 </main>
 
-@code{
+@code {
     private bool isAdminDropdownOpen = false;
     private void ToggleAdminDropDown()
     {
         isAdminDropdownOpen = !isAdminDropdownOpen;
     }
-
-
-
-
 
 }

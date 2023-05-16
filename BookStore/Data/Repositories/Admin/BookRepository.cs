@@ -61,6 +61,7 @@ namespace BookStore.Data.Repositories.Admin
             book.AuthorId= updatedbook.AuthorId;
             book.ISBN = updatedbook.ISBN;
             book.PublisherName = updatedbook.PublisherName;
+            book.Description = updatedbook.Description;
             book.PublicationYear= updatedbook.PublicationYear;
             book.BookCoverUrl = updatedbook.BookCoverUrl;
             book.StockQuantity = updatedbook.StockQuantity;

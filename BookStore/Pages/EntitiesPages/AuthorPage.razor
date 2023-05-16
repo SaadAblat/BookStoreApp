@@ -1,0 +1,82 @@
+﻿@page "/AuthorPage/{id:int}"
+
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
+@inject NavigationManager navigationManager
+
+
+<div class="page-container fs-small">
+    @if (_author != null)
+    {
+        <div class="d-flex gap-4">
+            @*<img id="book-cover" src="@_author.Picture" />*@
+            <div class="d-flex flex-column">
+
+                <div class="author-name fs-big fw-bold" > @_author.Name</div>
+                <span class="author-birth-death fs-normal">
+                    <span class="author-nationality">@_author.Nationality,</span> @_author.BirthDate -
+
+                @if (_author.DeathDate == 0)
+                {
+                    <span class="author-birth-death">Present</span>
+                }
+                else
+                {
+                    <span class="author-birth-death">@_author.DeathDate</span>
+                }
+                </span>
+                
+                <div class="fw-bold fs-normal ">Biographie</div>
+                
+                <div class="author-bio "> @_author.Biography</div>
+
+                <div class="fw-bold  fs-normal">Author books : </div>
+                <div id="books">
+                    @foreach (var book in _books)
+                    {
+                        <div class="book-container">
+                            <img class="book-cover" role="button" @onclick="() => GoToBookPage(book.ID)" src="@book.BookCoverUrl" />
+                            <div class="book-title fs-normal fw-bold" role="button" @onclick="() => GoToBookPage(book.ID)">
+                                @book.Title
+                            </div>
+                            <div class="book-price text-center my-2" role="button">
+                                @book.Price.ToString("C2")
+                            </div>
+                            <button class="btn btn-success btn-sm mb-3">Add to cart</button>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    List<Book> _books = new();
+    Author _author = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var repo = new AuthorRepository(ContextFactory.CreateDbContext()))
+        {
+            _author = await repo.GetAuthorByIdAsync(id);
+            _books = _author.Books.ToList();
+        }
+    }
+
+    void GoToBookPage(int id)
+    {
+        navigationManager.NavigateTo($"/BookPage/{id}");
+    }
+
+}

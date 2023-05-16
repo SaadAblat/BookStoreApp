@@ -46,6 +46,7 @@ namespace BookStore.Data.Repositories.Admin
             var genre = await GetGenreByIdAsync(updatedGenre.ID);
             genre.Name = updatedGenre.Name;
             genre.Description = updatedGenre.Description;
+            genre.IsFiction = updatedGenre.IsFiction;
             await _ctx.SaveChangesAsync();
             return genre;
         }

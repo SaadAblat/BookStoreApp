@@ -4,50 +4,47 @@
 @using BookStore.Entities;
 @using Microsoft.EntityFrameworkCore;
 @inject IDbContextFactory<DataContext> ContextFactory
-
 @inject NavigationManager navigationManager
+
+
 <PageTitle>Index</PageTitle>
 
-
-
 <div id="top-nav" class="fs-small">
-    <div @onclick="AllBooks" role="button" class="m-auto">All Books</div>
-    <div @onclick="ToggleFictionDropDown" role="button" class="m-auto dropdown-toggle">
+    <div @onclick="AllBooks" role="button" class="m-auto text-nowrap">All Books</div>
+    <div @onclick="ToggleFictionDropdown" role="button" class="m-auto dropdown-toggle">
         Fiction
         @if (isFictionDropdownOpen)
         {
-
-            <div class="dropdown-menu drppdwon-menu-right show position-absolute">
-                @foreach (var genre in _genres)
+           <div class="dropdown-menu dropdown-menu-right show position-absolute">
+                @foreach(var genre in _genres)
                 {
                     if (genre.IsFiction)
                     {
-                        <div @onclick="async ()=>await SelectGenre(genre)" class="dropdown-item fs-small">@genre.Name</div>
+                        <div @onclick="async () => await SelectGenre(genre)" class="dropdown-item fs-small">@genre.Name</div>
                     }
                 }
             </div>
         }
     </div>
-    <div @onclick="ToggleNonFictionDropDown" role="button" class="m-auto dropdown-toggle">
+    <div @onclick="ToggleNonFictionDropdown" role="button" class="m-auto dropdown-toggle">
         Non Fiction
         @if (isNonFictionDropdownOpen)
         {
-            <div class="dropdown-menu drppdwon-menu-right show position-absolute">
+            <div class="dropdown-menu dropdown-menu-right show position-absolute">
                 @foreach (var genre in _genres)
                 {
                     if (!genre.IsFiction)
                     {
-                        <div @onclick="async()=>await SelectGenre(genre)" class="dropdown-item fs-small">@genre.Name</div>
+                        <div @onclick="async () => await SelectGenre(genre)" class="dropdown-item fs-small">@genre.Name</div>
                     }
-
                 }
             </div>
         }
     </div>
-    <div class="w-100 ">
-        <SearchBox Items="_books" OnSearch="UpdateFilteredBooks"></SearchBox>
-    </div>
 
+    <div class="w-100"> 
+       <SearchBox Items="_books" OnSearch="UpdateFilteredBooks"></SearchBox>
+    </div>
 
 </div>
 
@@ -62,24 +59,26 @@
     else
     {
         <div class="genre my-5">
-            <div class="genre-title fs-big my-2">All books</div>
+            <div class="genre-title fs-big my-2">All Books</div>
         </div>
     }
 
-
     <div id="books">
-
-        @foreach (var book in _filteredBooks)
+        @foreach(var book in _filteredBooks)
         {
-
             <div class="book-container">
-                <img role="button" @onclick="()=>GoToBookPage(book.ID)" src="@book.BookCoverUrl" class="book-cover">
-                <div role="button" @onclick="()=>GoToBookPage(book.ID)" class="book-title fs-normal fw-bold">@book.Title</div>
-                <div role="button" @onclick="()=>GoToAuthorPage(book.Author.ID)" class="book-author fs-small">
+                <img class="book-cover" role="button" @onclick="() => GoToBookPage(book.ID)" src="@book.BookCoverUrl" />
+                <div class="book-title fs-normal fw-bold" role="button" @onclick="() => GoToBookPage(book.ID)">
+                    @book.Title
+                </div>
+                <div class="book-author fs-small" role="button" @onclick="() => GoToAuthorPage(book.AuthorId)">
                     @book.Author.Name
                 </div>
-                <div class="book-price fs-normal align-self-center my-2">@book.Price.ToString("C2")</div>
+                <div class="book-price text-center my-2" role="button">
+                    @book.Price.ToString("C2")
+                </div>
                 <button class="btn btn-success btn-sm mb-3">Add to cart</button>
+                
             </div>
         }
 
@@ -88,20 +87,22 @@
 </div>
 
 
+@code{
+    void AllBooks()
+    {
+        _filteredBooks = _books.ToList();
+        _selectedGenre = new Genre();
+    }
 
-
-
-@code {
-
-    private bool isFictionDropdownOpen = false;
-    private void ToggleFictionDropDown()
+    bool isFictionDropdownOpen = false;
+    void ToggleFictionDropdown()
     {
         isFictionDropdownOpen = !isFictionDropdownOpen;
         isNonFictionDropdownOpen = false;
     }
 
-    private bool isNonFictionDropdownOpen = false;
-    private void ToggleNonFictionDropDown()
+    bool isNonFictionDropdownOpen = false;
+    void ToggleNonFictionDropdown()
     {
         isNonFictionDropdownOpen = !isNonFictionDropdownOpen;
         isFictionDropdownOpen = false;
@@ -113,13 +114,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Get the book list
-
         using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
         {
             _books = await repo.GetAllBooksAsync();
             _filteredBooks = _books.ToList();
         }
+
         using (var repo = new GenreRepository(ContextFactory.CreateDbContext()))
         {
             _genres = await repo.GetAllGenreAsync();
@@ -131,14 +131,17 @@
     async Task SelectGenre(Genre genre)
     {
         _selectedGenre = genre;
-        _filteredBooks = _books.Where(b => b.BookGenres.Any(bg => bg.Genre.ID == _selectedGenre.ID)).ToList();
+        _filteredBooks = _books.Where(b => b.BookGenres.Any(bg => bg.Genre.ID == genre.ID)).ToList();
         await InvokeAsync(StateHasChanged);
     }
 
     void UpdateFilteredBooks(string searchTerm)
     {
-
-        if (!string.IsNullOrEmpty(searchTerm))
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            _filteredBooks = _books.ToList();
+        }
+        else
         {
             _filteredBooks = _books.Where(
 
@@ -150,21 +153,14 @@
         }
     }
 
-    void AllBooks()
+    void GoToBookPage(int id)
     {
-        _filteredBooks = _books.ToList();
-        _selectedGenre = new Genre();
+        navigationManager.NavigateTo($"/BookPage/{id}");
     }
-
 
     void GoToAuthorPage(int id)
     {
         navigationManager.NavigateTo($"/AuthorPage/{id}");
     }
 
-    void GoToBookPage(int id)
-    {
-        navigationManager.NavigateTo($"/BookPage/{id}");
-    }
 }
-

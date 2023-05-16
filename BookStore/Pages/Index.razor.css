@@ -1,83 +1,56 @@
-﻿#top-nav {
-    position: relative;
-    top: 0;
-    display: flex;
-    justify-content: start;
-    padding-block: 5px;
-    padding-inline: 50px;
-    border-bottom: solid 1px gray;
+﻿#top-nav{
+    position:relative;
+    top:0;
+    display:flex;
+    justify-content:start;
+    padding-block:5px;
+    padding-inline:50px;
+    border-bottom:solid 1px gray;
     gap:30px;
-}
-
-.nav-group {
-    display: flex;
-    gap: 30px;
-}
-
-
-#brand-genres {
-    justify-content: start;
-}
-
-#accounts {
-    justify-content: end;
 }
 
 .fs-small {
     font-size: 12px;
 }
+
 .fs-normal {
     font-size: 14px;
 }
+
 .fs-big {
-    font-size: 18px;
+    font-size: 16px;
 }
 
-
-.page-container {
-    max-width: 1250px;
-    margin: 20px auto;
+.page-container{
+    max-width:1250px;
+    margin:20px auto;
 }
-
-
-.genre {
-
-}
-.genre-title{
-
-}
-
-#books {
-    display: flex;
+#books{
+    display:flex;
     flex-wrap:wrap;
-    gap: 5px;
-    max-width: 100%;
-    
-    
+    gap:5px;
+    max-width:100%;
 }
 
 .book-title{
     margin-block:5px;
 }
 
-.book-container {
-    display: flex;
-    flex-direction: column;
+.book-container{
+    display:flex;
+    flex-direction:column;
     justify-content:space-between;
-    width: 200px;
+    width:200px;
     overflow:hidden;
 }
-
-.book-cover {
-    height: 300px;
+.book-cover{
+    height : 300px;
     width: 200px;
-    object-fit: cover;
-    box-shadow: 1px 0px 29px 0px rgba(0,0,0,0.21);
-    -webkit-box-shadow: 1px 0px 29px 0px rgba(0,0,0,0.21);
-    -moz-box-shadow: 1px 0px 29px 0px rgba(0,0,0,0.21);
-    border-radius: 2%;
+    object-fit:cover;
+    box-shadow:1px 0px 29px 0px rgba(0,0,0,0.21);
     transition: all 0.3s;
 }
+
 .book-cover:hover{
     transform:scale(1.03);
     transition:all 0.3s;

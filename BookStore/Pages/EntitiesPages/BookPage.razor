@@ -1,0 +1,51 @@
+﻿@page "/BookPage/{id:int}"
+
+@using BookStore.Data.Repositories.Admin;
+@using BookStore.Data;
+@using BookStore.Entities;
+@using Microsoft.EntityFrameworkCore;
+@inject IDbContextFactory<DataContext> ContextFactory
+@inject NavigationManager navigationManager
+
+
+<div class="page-container fs-small">
+    @if (_book != null)
+    {
+        <div class="d-flex gap-4">
+            <img id="book-cover" src="@_book.BookCoverUrl" />
+            <div class="d-flex flex-column">
+                <div role="button" @onclick="() => GoToAuthorPage(_author.ID)" class="book-author">@_author.Name</div>
+                <div class="book-title fs-big fw-bold">@_book.Title</div>
+                <div class="book-description">@_book.Description</div>
+
+                <button class="btn btn-success btn-sm m-5">Add to cart</button>
+
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    Book _book = new();
+    Author _author = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
+        {
+            _book = await repo.GetBookByIdAsync(id);
+            _author = _book.Author;
+        }
+    }
+
+    void GoToAuthorPage(int id)
+    {
+        navigationManager.NavigateTo($"/AuthorPage/{id}");
+    }
+
+}

@@ -1,0 +1,46 @@
+﻿.page-container {
+    max-width: 1250px;
+    margin: 60px auto;
+}
+.fs-small {
+    font-size: 18px;
+}
+
+.fs-normal {
+    font-size: 25px;
+}
+
+.fs-big {
+    font-size: 50px;
+}
+#books {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    max-width: 100%;
+}
+
+.book-title {
+    margin-block: 5px;
+}
+
+.book-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 200px;
+    overflow: hidden;
+}
+
+.book-cover {
+    height: 300px;
+    width: 200px;
+    object-fit: cover;
+    box-shadow: 1px 0px 29px 0px rgba(0,0,0,0.21);
+    transition: all 0.3s;
+}
+
+    .book-cover:hover {
+        transform: scale(1.03);
+        transition: all 0.3s;
+    }

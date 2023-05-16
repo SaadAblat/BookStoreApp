@@ -1,0 +1,27 @@
+﻿.page-container {
+    max-width: 1250px;
+    margin: 60px auto;
+}
+
+
+#book-cover {
+    height: 800px;
+    object-fit: cover;
+
+}
+
+
+
+
+.fs-small {
+    font-size: 18px;
+}
+
+.fs-normal {
+    font-size: 25px;
+}
+
+.fs-big {
+    font-size: 50px;
+    
+}
