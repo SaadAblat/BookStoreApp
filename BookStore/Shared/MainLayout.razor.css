@@ -14,7 +14,7 @@ a {
 
 .nav-group {
     display: flex;
-    gap: 30px;
+    column-gap: 80px;
 }
 
 
@@ -24,6 +24,7 @@ a {
 
 #accounts {
     justify-content: end;
+    padding-inline-end:80px;
 }
 
 .fs-small {
@@ -37,3 +38,19 @@ a {
 .fs-big {
     font-size: 16px;
 }
+
+.icon {
+    font-size: 18px;
+    color: #231b11;
+    transition: all 0.3s;
+}
+    .icon:hover {
+        transform: scale(1.1);
+        color: #e8a24c;
+        transition: all 0.3s;
+    }
+    .icon:active {
+        transform: scale(0.95);
+        color: #14100c;
+        transition: all 0.3s;
+    }

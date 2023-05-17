@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using BookStore.Services;
+@inherits LayoutComponentBase
+
+@inject CartService CartService
 
 <PageTitle>BookStore</PageTitle>
 
@@ -15,8 +18,8 @@
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <div class="">
-                    <div @onclick="ToggleAdminDropDown" role="button" class="dropdown-toggle">
-                        Admin
+                    <div @onclick="ToggleAdminDropDown" role="button" class="dropdown-toggle ">
+                        <span class="icon">Admin</span>
                         @if (isAdminDropdownOpen)
                         {
                             <div class="dropdown-menu drppdwon-menu-right show position-absolute">
@@ -34,21 +37,21 @@
         <AuthorizeView>
             <Authorized>
 
-                <div class="">
-                    <a class="" href="">
-                        <i class="oi oi-cart"></i>
+                <div >
+                    <a @onclick="ToggleCart" class=" icon">
+                        <i role="button" class="oi oi-cart icon"></i>
                     </a>
                 </div>
-                <div class="">
-                    <a class="" href="Identity/Account/Logout">
-                        <i class="oi oi-account-logout"></i>
+                <div >
+                    <a class="icon" href="Identity/Account/Logout">
+                        <i role="button" class="oi oi-account-logout "></i>
                     </a>
                 </div>
             </Authorized>
             <NotAuthorized>
-                <div class="">
-                    <a class="" href="Identity/Account/Login">
-                        <i class="oi oi-person"></i>
+                <div>
+                    <a class="icon" href="Identity/Account/Login">
+                        <i role="button" class="oi oi-person "></i>
                     </a>
                 </div>
 
@@ -67,6 +70,13 @@
     private void ToggleAdminDropDown()
     {
         isAdminDropdownOpen = !isAdminDropdownOpen;
+    }
+
+    private void ToggleCart()
+    {
+        CartService.ShowCart = !CartService.ShowCart;
+        
+
     }
 
 }

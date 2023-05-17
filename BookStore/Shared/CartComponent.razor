@@ -1,0 +1,164 @@
+﻿
+@inject IDbContextFactory<DataContext> ContextFactory
+@inject NavigationManager navigationManager
+
+
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject UserManager<ApplicationUser> userManager
+
+@inject CartService CartService
+
+
+<div style="display:@(CartService.ShowCart ? "block" : "none")">
+    <div class="overlay @(CartService.StartAnimation ? "" : "open")" @onclick="async() => await HideCart()"></div>
+    <div class="side-cart @(CartService.StartAnimation ? "closed" : "open")">
+        <div class="d-flex flex-row w-100 justify-content-between">
+            <div class="my-3 fs-4"> Your Cart</div>
+            <div class="close" role="button" @onclick="async() => await HideCart()"><i class="oi oi-circle-x"></i></div>
+
+        </div>
+        <div class="products">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Product</td>
+                        <td></td>
+                        <td class="text-end">Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in CartItems)
+                    {
+                        <tr>
+                            <td><img src="@item.Book.BookCoverUrl" width="100" /></td>
+                            <td  class="text-start ">
+                                <div class="product-name">@item.Book.Title</div>
+                                <div class="">@item.Book.Price.ToString("C2")</div>
+                                <div class="d-flex justify-content-between gap-4 ">
+                                    <div class="quantity d-flex justify-content-between  ">
+                                        <i role="button" @onclick="async() => await ChangeQuantity(-1, item)" class="oi oi-minus sign"></i>
+                                        <span class="quantity-value">@item.Quantity</span>
+                                        <i role="button" @onclick="async() => await ChangeQuantity(1, item) " class="oi oi-plus sign"></i>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column justify-content-end ">
+                                    <div>
+                                        @((item.Book.Price * item.Quantity).ToString("C2"))
+                                    </div>
+                                    <div class="align-self-center delete">
+                                        <i role="button" @onclick="async() => await RemoveItemAsync(item)" class="oi oi-trash "></i>
+                                    </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+        <div class="order">
+            <div class="d-flex flex-row justify-content-between">
+                <div>SubTotal</div>
+                <div>@CalculateOrderSum().ToString("C2")</div>
+            </div>
+            <div class="w-100 m-auto my-3">
+                <button class="btn btn-success w-100">Order Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    //Adding the user
+    ApplicationUser _user = new ApplicationUser();
+
+    [Parameter]
+    public List<CartItem> CartItems { get; set; } = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        CartService.OnChange += StateHasChanged;
+
+        //Adding the user
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            using (var repo = new UserRepository(
+            ContextFactory.CreateDbContext(),
+            userManager,
+            authenticationStateProvider))
+            {
+                _user = await repo.GetUserAsync();
+            }
+        }
+
+    }
+    public void Dispose()
+    {
+        CartService.OnChange -= StateHasChanged;
+    }
+
+
+    private async Task HideCart()
+    {
+
+        CartService.StartAnimation = true;
+        await Task.Delay(300);
+        CartService.ShowCart = false;
+
+        CartService.StartAnimation = false;
+    }
+
+
+
+    async Task ChangeQuantity(int number, CartItem item)
+    {
+        if ((item.Quantity <= 1 && number < 0))
+        {
+            return;
+        }
+
+        item.Quantity += number;
+        using (var repo = new UserRepository(
+        ContextFactory.CreateDbContext(),
+        userManager,
+        authenticationStateProvider))
+        {
+            await repo.UpdateItem(item);
+        }
+        CartItems = _user.Cart.CartItems.ToList();
+
+
+
+    }
+
+    async Task RemoveItemAsync(CartItem item)
+    {
+        using (var repo = new UserRepository(
+            ContextFactory.CreateDbContext(),
+            userManager,
+            authenticationStateProvider))
+        {
+            await repo.RemoveItemFromCart(item);
+            CartItems.Remove(item);
+        }
+    }
+
+    decimal CalculateOrderSum()
+    {
+        decimal total = 0;
+        foreach (var item in CartItems)
+        {
+            total += item.Quantity * item.Book.Price;
+        }
+        return total;
+    }
+}

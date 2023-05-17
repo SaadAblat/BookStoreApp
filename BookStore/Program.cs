@@ -1,5 +1,7 @@
 using BookStore.Data;
+using BookStore.Data.Repositories.Customer;
 using BookStore.Entities;
+using BookStore.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +33,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<DataContext>();
+
+builder.Services.AddScoped<CartService>();
 
 var app = builder.Build();
 

@@ -1,12 +1,13 @@
 ﻿@page "/BookPage/{id:int}"
 
-@using BookStore.Data.Repositories.Admin;
-@using BookStore.Data;
-@using BookStore.Entities;
-@using Microsoft.EntityFrameworkCore;
 @inject IDbContextFactory<DataContext> ContextFactory
 @inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject UserManager<ApplicationUser> userManager
+@inject CartService CartService
 
+
+<CartComponent CartItems="@_cartItems"></CartComponent>
 
 <div class="page-container fs-small">
     @if (_book != null)
@@ -34,6 +35,11 @@
     Book _book = new();
     Author _author = new();
 
+
+    //Adding the user
+    ApplicationUser _user = new ApplicationUser();
+    List<CartItem> _cartItems = new();
+
     protected override async Task OnInitializedAsync()
     {
         using (var repo = new BookRepository(ContextFactory.CreateDbContext()))
@@ -41,11 +47,44 @@
             _book = await repo.GetBookByIdAsync(id);
             _author = _book.Author;
         }
+        //Adding the user
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            using (var repo = new UserRepository(
+            ContextFactory.CreateDbContext(),
+            userManager,
+            authenticationStateProvider))
+            {
+                _user = await repo.GetUserAsync();
+                _cartItems = _user.Cart.CartItems.ToList();
+            }
+        }
     }
 
     void GoToAuthorPage(int id)
     {
         navigationManager.NavigateTo($"/AuthorPage/{id}");
+    }
+
+    async Task AddToCartAsync(Book book)
+    {
+        using (var repo = new UserRepository(
+            ContextFactory.CreateDbContext(),
+            userManager,
+            authenticationStateProvider))
+        {
+            var item = await repo.AddToCartAsync(book, _user);
+            await repo.UpdateItem(item);
+            _user = await repo.GetUserAsync();
+            _cartItems = _user.Cart.CartItems.ToList();
+
+        }
+        await InvokeAsync(StateHasChanged);
+        CartService.ShowCart = true;
+
     }
 
 }
